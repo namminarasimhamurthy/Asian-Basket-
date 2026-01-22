@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 142 72% 10%;
+    /* Dark green-black text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 142 72% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 142 72% 10%;
+
+    /* VegSpot Green Primary */
+    --primary: 142 72% 29%;
+    /* #15803d */
+    --primary-foreground: 0 0% 100%;
+
+    /* Light Green Secondary/Accent */
+    --secondary: 142 70% 95%;
+    /* #f0fdf4 */
+    --secondary-foreground: 142 72% 29%;
+
+    --muted: 140 20% 96%;
+    --muted-foreground: 142 20% 45%;
+
+    /* Orange for badges/offers */
+    --accent: 24 95% 53%;
+    /* #f97316 */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 142 20% 90%;
+    --input: 142 20% 90%;
+    --ring: 142 72% 29%;
+
+    --radius: 0.5rem;
+    /* Slightly sharper corners */
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 140 10% 20%;
+    --sidebar-primary: 142 72% 29%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 70% 95%;
+    --sidebar-accent-foreground: 142 72% 29%;
+    --sidebar-border: 142 20% 90%;
+    --sidebar-ring: 142 72% 29%;
+  }
+
+  .dark {
+    --background: 142 50% 5%;
+    --foreground: 0 0% 98%;
+
+    --card: 142 50% 8%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 142 50% 8%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 142 70% 45%;
+    /* Brighter green for dark mode */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 142 50% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 142 30% 15%;
+    --muted-foreground: 142 20% 65%;
+
+    --accent: 24 95% 53%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 142 30% 20%;
+    --input: 142 30% 20%;
+    --ring: 142 70% 45%;
+
+    --sidebar-background: 142 50% 8%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 142 70% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 142 50% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 142 30% 20%;
+    --sidebar-ring: 142 70% 45%;
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+/* Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  display: inline-block;
+  animation: marquee 20s linear infinite;
+  white-space: nowrap;
+}
+
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
