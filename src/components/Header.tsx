@@ -101,7 +101,7 @@
 //             <Button variant="ghost" size="icon" className="hidden md:inline-flex text-muted-foreground hover:text-primary hover:bg-secondary">
 //               <Heart className="h-5 w-5" />
 //             </Button>
-           
+
 //             {/* Account */}
 //             {isAuthenticated ? (
 //               <DropdownMenu>
@@ -282,7 +282,6 @@
 // };
 
 // export default Header;
-
 
 // import { useState, useEffect } from 'react';
 // import { Link, useNavigate } from 'react-router-dom';
@@ -472,7 +471,6 @@
 // };
 
 // export default Header;
-
 
 // import { useState, useEffect } from "react";
 // import { Link, useNavigate } from "react-router-dom";
@@ -668,7 +666,6 @@
 
 // export default Header;
 
-
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, ShoppingBag, User, LogOut } from "lucide-react";
@@ -830,7 +827,10 @@ const Header = () => {
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="outline">Sign Up</Button>
+                  <Button variant="ghost">
+                    <User className="h-5 w-5 mr-1" />
+                    Signup
+                  </Button>
                 </Link>
               </div>
             )}

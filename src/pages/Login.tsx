@@ -146,7 +146,6 @@
 
 // export default Login;
 
-
 // import { useState } from "react";
 // import { useNavigate, Link } from "react-router-dom";
 // import { Eye, EyeOff, LogIn, Mail, Lock } from "lucide-react";
@@ -312,7 +311,6 @@
 
 // export default Login;
 
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
@@ -397,19 +395,12 @@ const Login = () => {
               className="mx-auto h-24 object-contain mb-4"
             />
 
-            <CardTitle className="text-2xl font-bold">
-              Welcome Back
-            </CardTitle>
-            <CardDescription>
-              Sign in to your account
-            </CardDescription>
+            <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+            <CardDescription>Sign in to your account</CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-4"
-            >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* EMAIL */}
               <div className="space-y-2">
                 <Label>Email</Label>
@@ -474,7 +465,7 @@ const Login = () => {
                 to="/register"
                 className="text-primary font-semibold hover:underline"
               >
-                Sign up
+                Signup
               </Link>
             </div>
           </CardContent>
@@ -485,4 +476,3 @@ const Login = () => {
 };
 
 export default Login;
-

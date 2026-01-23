@@ -1,550 +1,5 @@
-// import { useState } from 'react';
-// import { useNavigate, Link } from 'react-router-dom';
-// import { User, Mail, Phone, Edit2, Save, ArrowLeft, ShoppingBag, LogOut } from 'lucide-react';
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// import { useAuth } from '@/contexts/AuthContext';
-// import { useToast } from '@/hooks/use-toast';
-// import Header from '@/components/Header';
-// import Footer from '@/components/Footer';
-
-// const Profile = () => {
-//     const navigate = useNavigate();
-//     const { user, updateUser, logout } = useAuth();
-//     const { toast } = useToast();
-//     const [isEditing, setIsEditing] = useState(false);
-//     const [formData, setFormData] = useState({
-//         name: user?.name || '',
-//         phone: user?.phone || '',
-//     });
-
-//     const handleSave = () => {
-//         updateUser({
-//             name: formData.name,
-//             phone: formData.phone,
-//         });
-//         setIsEditing(false);
-//         toast({
-//             title: 'Profile updated',
-//             description: 'Your profile has been updated successfully.',
-//         });
-//     };
-
-//     const handleLogout = () => {
-//         logout();
-//         navigate('/');
-//     };
-
-//     if (!user) {
-//         return null;
-//     }
-
-//     return (
-//         <div className="min-h-screen bg-background">
-//             <Header />
-
-//             <main className="pt-[188px] md:pt-[200px] pb-16 px-4">
-//                 <div className="max-w-2xl mx-auto">
-//                     {/* Back Button */}
-//                     <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6">
-//                         <ArrowLeft className="h-4 w-4 mr-2" />
-//                         Back to Home
-//                     </Link>
-
-//                     {/* Profile Card */}
-//                     <Card className="shadow-lg border-2">
-//                         <CardHeader className="text-center border-b">
-//                             <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4">
-//                                 <span className="text-primary-foreground font-bold text-3xl">
-//                                     {user.name.charAt(0).toUpperCase()}
-//                                 </span>
-//                             </div>
-//                             <CardTitle className="text-2xl">{user.name}</CardTitle>
-//                             <CardDescription>{user.email}</CardDescription>
-//                         </CardHeader>
-//                         <CardContent className="pt-6">
-//                             {/* Profile Info */}
-//                             <div className="space-y-4">
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="name">Full Name</Label>
-//                                     <div className="relative">
-//                                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-//                                         <Input
-//                                             id="name"
-//                                             value={formData.name}
-//                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-//                                             disabled={!isEditing}
-//                                             className="pl-10"
-//                                         />
-//                                     </div>
-//                                 </div>
-
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="email">Email</Label>
-//                                     <div className="relative">
-//                                         <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-//                                         <Input
-//                                             id="email"
-//                                             value={user.email}
-//                                             disabled
-//                                             className="pl-10 bg-muted"
-//                                         />
-//                                     </div>
-//                                     <p className="text-xs text-muted-foreground">Email cannot be changed</p>
-//                                 </div>
-
-//                                 <div className="space-y-2">
-//                                     <Label htmlFor="phone">Phone Number</Label>
-//                                     <div className="relative">
-//                                         <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-//                                         <Input
-//                                             id="phone"
-//                                             value={formData.phone}
-//                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-//                                             disabled={!isEditing}
-//                                             className="pl-10"
-//                                         />
-//                                     </div>
-//                                 </div>
-
-//                                 {/* Action Buttons */}
-//                                 <div className="flex gap-3 pt-4">
-//                                     {isEditing ? (
-//                                         <>
-//                                             <Button
-//                                                 onClick={handleSave}
-//                                                 className="flex-1 bg-primary hover:bg-primary/90"
-//                                             >
-//                                                 <Save className="h-4 w-4 mr-2" />
-//                                                 Save Changes
-//                                             </Button>
-//                                             <Button
-//                                                 variant="outline"
-//                                                 onClick={() => {
-//                                                     setIsEditing(false);
-//                                                     setFormData({
-//                                                         name: user.name,
-//                                                         phone: user.phone || '',
-//                                                     });
-//                                                 }}
-//                                                 className="flex-1"
-//                                             >
-//                                                 Cancel
-//                                             </Button>
-//                                         </>
-//                                     ) : (
-//                                         <Button
-//                                             onClick={() => setIsEditing(true)}
-//                                             variant="outline"
-//                                             className="flex-1"
-//                                         >
-//                                             <Edit2 className="h-4 w-4 mr-2" />
-//                                             Edit Profile
-//                                         </Button>
-//                                     )}
-//                                 </div>
-//                             </div>
-
-//                             {/* Quick Links */}
-//                             <div className="mt-8 pt-6 border-t space-y-3">
-//                                 <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
-
-//                                 <Button
-//                                     variant="outline"
-//                                     className="w-full justify-start h-12"
-//                                     onClick={() => navigate('/orders')}
-//                                 >
-//                                     <ShoppingBag className="h-5 w-5 mr-3" />
-//                                     My Orders
-//                                 </Button>
-
-//                                 <Button
-//                                     variant="outline"
-//                                     className="w-full justify-start h-12 text-destructive hover:text-destructive hover:bg-destructive/10"
-//                                     onClick={handleLogout}
-//                                 >
-//                                     <LogOut className="h-5 w-5 mr-3" />
-//                                     Logout
-//                                 </Button>
-//                             </div>
-
-//                             {/* Account Info */}
-//                             <div className="mt-6 pt-6 border-t">
-//                                 <p className="text-xs text-muted-foreground text-center">
-//                                     Member since {new Date(user.createdAt).toLocaleDateString('en-US', {
-//                                         year: 'numeric',
-//                                         month: 'long',
-//                                         day: 'numeric',
-//                                     })}
-//                                 </p>
-//                             </div>
-//                         </CardContent>
-//                     </Card>
-//                 </div>
-//             </main>
-
-//             <Footer />
-//         </div>
-//     );
-// };
-
-// export default Profile;
-
-
-// import { useState } from 'react';
-// import { useNavigate, Link } from 'react-router-dom';
-// import {
-//   User, Mail, Phone, Edit2, Save, ArrowLeft,
-//   ShoppingBag, LogOut, MapPin
-// } from 'lucide-react';
-
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import {
-//   Card, CardContent, CardDescription,
-//   CardHeader, CardTitle
-// } from '@/components/ui/card';
-
-// import { useAuth } from '@/contexts/AuthContext';
-// import { useToast } from '@/hooks/use-toast';
-// import Header from '@/components/Header';
-// import Footer from '@/components/Footer';
-
-// const Profile = () => {
-//   const navigate = useNavigate();
-//   const { user, updateUser, logout } = useAuth();
-//   const { toast } = useToast();
-
-//   const [editProfile, setEditProfile] = useState(false);
-//   const [editAddress, setEditAddress] = useState(false);
-
-//   const [name, setName] = useState(user?.name || '');
-//   const [phone, setPhone] = useState(user?.phone || '');
-
-//   const [address, setAddress] = useState(user?.address || '');
-//   const [city, setCity] = useState(user?.city || '');
-//   const [state, setState] = useState(user?.state || '');
-//   const [zip, setZip] = useState(user?.zip || '');
-
-//   const saveProfile = () => {
-//     updateUser({ name, phone });
-//     setEditProfile(false);
-//     toast({ title: 'Profile updated' });
-//   };
-
-//   const saveAddress = () => {
-//     updateUser({ address, city, state, zip });
-//     setEditAddress(false);
-//     toast({ title: 'Address updated' });
-//   };
-
-//   const handleLogout = () => {
-//     logout();
-//     navigate('/');
-//   };
-
-//   if (!user) return null;
-
-//   return (
-//     <div className="min-h-screen bg-background">
-//       <Header />
-
-//       <main className="pt-[188px] md:pt-[200px] pb-16 px-4">
-//         <div className="max-w-2xl mx-auto">
-
-//           <Link to="/" className="inline-flex items-center mb-6 text-muted-foreground hover:text-foreground">
-//             <ArrowLeft className="h-4 w-4 mr-2" /> Back to Home
-//           </Link>
-
-//           <Card className="shadow-lg border-2">
-//             <CardHeader className="text-center border-b">
-//               <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4">
-//                 <span className="text-primary-foreground font-bold text-3xl">
-//                   {user.name.charAt(0).toUpperCase()}
-//                 </span>
-//               </div>
-//               <CardTitle>{user.name}</CardTitle>
-//               <CardDescription>{user.email}</CardDescription>
-//             </CardHeader>
-
-//             <CardContent className="space-y-6 pt-6">
-
-//               {/* PROFILE SECTION */}
-//               <div className="space-y-3">
-//                 <div className="flex justify-between items-center">
-//                   <h3 className="font-semibold text-lg">Profile</h3>
-//                   <Button size="sm" variant="outline" onClick={() => setEditProfile(!editProfile)}>
-//                     <Edit2 className="h-4 w-4 mr-1" />
-//                     {editProfile ? 'Cancel' : 'Edit'}
-//                   </Button>
-//                 </div>
-
-//                 <Label>Name</Label>
-//                 <Input value={name} disabled={!editProfile} onChange={e => setName(e.target.value)} />
-
-//                 <Label>Phone</Label>
-//                 <Input value={phone} disabled={!editProfile} onChange={e => setPhone(e.target.value)} />
-
-//                 {editProfile && (
-//                   <Button onClick={saveProfile} className="w-full mt-2">
-//                     <Save className="h-4 w-4 mr-2" /> Save Profile
-//                   </Button>
-//                 )}
-//               </div>
-
-//               {/* ADDRESS SECTION */}
-//               <div className="space-y-3 border-t pt-4">
-//                 <div className="flex justify-between items-center">
-//                   <h3 className="font-semibold text-lg flex items-center gap-2">
-//                     <MapPin className="h-5 w-5" /> Address
-//                   </h3>
-//                   <Button size="sm" variant="outline" onClick={() => setEditAddress(!editAddress)}>
-//                     <Edit2 className="h-4 w-4 mr-1" />
-//                     {editAddress ? 'Cancel' : 'Edit'}
-//                   </Button>
-//                 </div>
-
-//                 <Label>Street</Label>
-//                 <Input value={address} disabled={!editAddress} onChange={e => setAddress(e.target.value)} />
-
-//                 <Label>City</Label>
-//                 <Input value={city} disabled={!editAddress} onChange={e => setCity(e.target.value)} />
-
-//                 <Label>State</Label>
-//                 <Input value={state} disabled={!editAddress} onChange={e => setState(e.target.value)} />
-
-//                 <Label>Zip</Label>
-//                 <Input value={zip} disabled={!editAddress} onChange={e => setZip(e.target.value)} />
-
-//                 {editAddress && (
-//                   <Button onClick={saveAddress} className="w-full mt-2">
-//                     <Save className="h-4 w-4 mr-2" /> Save Address
-//                   </Button>
-//                 )}
-//               </div>
-
-//               {/* QUICK LINKS */}
-//               <div className="pt-6 border-t space-y-3">
-//                 <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/orders')}>
-//                   <ShoppingBag className="h-5 w-5 mr-3" /> My Orders
-//                 </Button>
-
-//                 <Button variant="outline" className="w-full justify-start text-destructive" onClick={handleLogout}>
-//                   <LogOut className="h-5 w-5 mr-3" /> Logout
-//                 </Button>
-//               </div>
-
-//             </CardContent>
-//           </Card>
-//         </div>
-//       </main>
-
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default Profile;
-
-
-// import { useState, useEffect } from 'react';
-// import { useNavigate, Link } from 'react-router-dom';
-// import {
-//   User, Edit2, Save, ArrowLeft,
-//   ShoppingBag, LogOut, MapPin
-// } from 'lucide-react';
-// import axios from 'axios';
-
-// import { Button } from '@/components/ui/button';
-// import { Input } from '@/components/ui/input';
-// import { Label } from '@/components/ui/label';
-// import {
-//   Card, CardContent, CardDescription,
-//   CardHeader, CardTitle
-// } from '@/components/ui/card';
-
-// import { useAuth } from '@/contexts/AuthContext';
-// import { useToast } from '@/hooks/use-toast';
-// import Header from '@/components/Header';
-// import Footer from '@/components/Footer';
-
-// const API = "http://127.0.0.1:8000/api/auth/";
-
-// const Profile = () => {
-//   const navigate = useNavigate();
-//   const { user, updateUser, logout } = useAuth();
-//   const { toast } = useToast();
-
-//   const [editProfile, setEditProfile] = useState(false);
-//   const [editAddress, setEditAddress] = useState(false);
-
-//   const [name, setName] = useState(user?.name || '');
-//   const [phone, setPhone] = useState(user?.phone || '');
-
-//   const [address, setAddress] = useState('');
-//   const [city, setCity] = useState('');
-//   const [state, setState] = useState('');
-//   const [zip, setZip] = useState('');
-
-//   /* ================================
-//      LOAD ADDRESS FROM BACKEND
-//   ================================ */
-//   useEffect(() => {
-//     axios.get(`${API}addresses/`, { withCredentials: true })
-//       .then(res => {
-//         if (res.data.length > 0) {
-//           const a = res.data[0];
-//           setAddress(a.address);
-//           setCity(a.city);
-//           setState(a.state);
-//           setZip(a.zip);
-//         }
-//       });
-//   }, []);
-
-//   const saveProfile = () => {
-//     updateUser({ name, phone });
-//     setEditProfile(false);
-//     toast({ title: 'Profile updated' });
-//   };
-
-//   /* ================================
-//      SAVE ADDRESS
-//   ================================ */
-//   const saveAddress = async () => {
-//     try {
-//       await axios.post(
-//         `${API}addresses/`,
-//         { address, city, state, zip },
-//         { withCredentials: true }
-//       );
-
-//       setEditAddress(false);
-//       toast({ title: 'Address saved successfully' });
-//     } catch (err: any) {
-//       console.log("ADDRESS ERROR:", err.response?.data);
-//       toast({
-//         title: 'Failed to save address',
-//         description: JSON.stringify(err.response?.data),
-//         variant: 'destructive',
-//       });
-//     }
-//   };
-
-//   const handleLogout = () => {
-//     logout();
-//     navigate('/');
-//   };
-
-//   if (!user) return null;
-
-//   return (
-//     <div className="min-h-screen bg-background">
-//       <Header />
-
-//       <main className="pt-[188px] md:pt-[200px] pb-16 px-4">
-//         <div className="max-w-2xl mx-auto">
-
-//           <Link to="/" className="inline-flex items-center mb-6 text-muted-foreground hover:text-foreground">
-//             <ArrowLeft className="h-4 w-4 mr-2" /> Back to Home
-//           </Link>
-
-//           <Card className="shadow-lg border-2">
-//             <CardHeader className="text-center border-b">
-//               <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-4">
-//                 <span className="text-primary-foreground font-bold text-3xl">
-//                   {user.name.charAt(0).toUpperCase()}
-//                 </span>
-//               </div>
-//               <CardTitle>{user.name}</CardTitle>
-//               <CardDescription>{user.email}</CardDescription>
-//             </CardHeader>
-
-//             <CardContent className="space-y-6 pt-6">
-
-//               {/* PROFILE */}
-//               <div className="space-y-3">
-//                 <div className="flex justify-between items-center">
-//                   <h3 className="font-semibold text-lg">Profile</h3>
-//                   <Button size="sm" variant="outline" onClick={() => setEditProfile(!editProfile)}>
-//                     <Edit2 className="h-4 w-4 mr-1" />
-//                     {editProfile ? 'Cancel' : 'Edit'}
-//                   </Button>
-//                 </div>
-
-//                 <Label>Name</Label>
-//                 <Input value={name} disabled={!editProfile} onChange={e => setName(e.target.value)} />
-
-//                 <Label>Phone</Label>
-//                 <Input value={phone} disabled={!editProfile} onChange={e => setPhone(e.target.value)} />
-
-//                 {editProfile && (
-//                   <Button onClick={saveProfile} className="w-full mt-2">
-//                     <Save className="h-4 w-4 mr-2" /> Save Profile
-//                   </Button>
-//                 )}
-//               </div>
-
-//               {/* ADDRESS */}
-//               <div className="space-y-3 border-t pt-4">
-//                 <div className="flex justify-between items-center">
-//                   <h3 className="font-semibold text-lg flex items-center gap-2">
-//                     <MapPin className="h-5 w-5" /> Address
-//                   </h3>
-//                   <Button size="sm" variant="outline" onClick={() => setEditAddress(!editAddress)}>
-//                     <Edit2 className="h-4 w-4 mr-1" />
-//                     {editAddress ? 'Cancel' : 'Edit'}
-//                   </Button>
-//                 </div>
-
-//                 <Label>Street</Label>
-//                 <Input value={address} disabled={!editAddress} onChange={e => setAddress(e.target.value)} />
-
-//                 <Label>City</Label>
-//                 <Input value={city} disabled={!editAddress} onChange={e => setCity(e.target.value)} />
-
-//                 <Label>State</Label>
-//                 <Input value={state} disabled={!editAddress} onChange={e => setState(e.target.value)} />
-
-//                 <Label>Zip</Label>
-//                 <Input value={zip} disabled={!editAddress} onChange={e => setZip(e.target.value)} />
-
-//                 {editAddress && (
-//                   <Button onClick={saveAddress} className="w-full mt-2">
-//                     <Save className="h-4 w-4 mr-2" /> Save Address
-//                   </Button>
-//                 )}
-//               </div>
-
-//               {/* QUICK LINKS */}
-//               <div className="pt-6 border-t space-y-3">
-//                 <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/orders')}>
-//                   <ShoppingBag className="h-5 w-5 mr-3" /> My Orders
-//                 </Button>
-
-//                 <Button variant="outline" className="w-full justify-start text-destructive" onClick={handleLogout}>
-//                   <LogOut className="h-5 w-5 mr-3" /> Logout
-//                 </Button>
-//               </div>
-
-//             </CardContent>
-//           </Card>
-//         </div>
-//       </main>
-
-//       <Footer />
-//     </div>
-//   );
-// };
-
-// export default Profile;
-
-
-// import { useState, useEffect } from "react";
-// import { useNavigate, Link } from "react-router-dom";
+// import { useEffect, useMemo, useState } from "react";
+// import { useNavigate, Link, useSearchParams } from "react-router-dom";
 // import {
 //   Edit2,
 //   Save,
@@ -552,9 +7,9 @@
 //   ShoppingBag,
 //   LogOut,
 //   MapPin,
+//   Trash2,
+//   Plus,
 // } from "lucide-react";
-// import axios from "axios";
-
 // import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
@@ -565,56 +20,80 @@
 //   CardHeader,
 //   CardTitle,
 // } from "@/components/ui/card";
-
 // import { useAuth } from "@/contexts/AuthContext";
 // import { useToast } from "@/hooks/use-toast";
 // import Header from "@/components/Header";
 // import Footer from "@/components/Footer";
 
+// import {
+//   listAddresses,
+//   createAddress,
+//   deleteAddress,
+//   setDefaultAddress,
+// } from "@/api/addresses";
 
-// /* ================================
-//    AXIOS GLOBAL CONFIG
-// ================================ */
-// axios.defaults.withCredentials = true;
-// axios.defaults.xsrfCookieName = "csrftoken";
-// axios.defaults.xsrfHeaderName = "X-CSRFToken";
-
-// const API = "http://127.0.0.1:8000/api/auth/addresses/";
+// type Address = {
+//   id: string;
+//   label?: string;
+//   full_name?: string;
+//   phone?: string;
+//   line1: string;
+//   line2?: string;
+//   city: string;
+//   state: string;
+//   zip_code: string;
+//   country: string;
+//   notes?: string;
+//   is_default: boolean;
+// };
 
 // const Profile = () => {
 //   const navigate = useNavigate();
+//   const [params] = useSearchParams();
+//   const returnTo = params.get("return");
+
 //   const { user, updateUser, logout } = useAuth();
 //   const { toast } = useToast();
 
 //   const [editProfile, setEditProfile] = useState(false);
-//   const [editAddress, setEditAddress] = useState(false);
-
 //   const [name, setName] = useState(user?.name || "");
 //   const [phone, setPhone] = useState(user?.phone || "");
 
-//   const [address, setAddress] = useState("");
-//   const [city, setCity] = useState("");
-//   const [state, setState] = useState("");
-//   const [zip, setZip] = useState("");
+//   const [addresses, setAddresses] = useState<Address[]>([]);
+//   const [loadingAddr, setLoadingAddr] = useState(true);
 
-//   /* ================================
-//      LOAD ADDRESS FROM BACKEND
-//   ================================ */
+//   // New address form (minimal)
+//   const [newAddr, setNewAddr] = useState({
+//     label: "Home",
+//     line1: "",
+//     line2: "",
+//     city: "",
+//     state: "",
+//     zip_code: "",
+//     country: "IN",
+//     notes: "",
+//   });
+
+//   const canAddMore = addresses.length < 3;
+//   const defaultId = useMemo(
+//     () => addresses.find((a) => a.is_default)?.id,
+//     [addresses],
+//   );
+
+//   const load = async () => {
+//     try {
+//       setLoadingAddr(true);
+//       const data = await listAddresses();
+//       setAddresses(data);
+//     } catch (e: any) {
+//       toast({ title: "Failed to load addresses", variant: "destructive" });
+//     } finally {
+//       setLoadingAddr(false);
+//     }
+//   };
+
 //   useEffect(() => {
-//     axios
-//       .get(API)
-//       .then((res) => {
-//         if (res.data.length > 0) {
-//           const a = res.data[0];
-//           setAddress(a.address);
-//           setCity(a.city);
-//           setState(a.state);
-//           setZip(a.zip);
-//         }
-//       })
-//       .catch(() => {
-//         console.log("No address found");
-//       });
+//     load();
 //   }, []);
 
 //   const saveProfile = () => {
@@ -623,21 +102,53 @@
 //     toast({ title: "Profile updated" });
 //   };
 
-//   /* ================================
-//      SAVE ADDRESS TO DJANGO
-//   ================================ */
-//   const saveAddress = async () => {
+//   const onAddAddress = async () => {
 //     try {
-//       await axios.post(API, { address, city, state, zip });
-//       setEditAddress(false);
-//       toast({ title: "Address saved successfully" });
+//       if (!canAddMore) return;
+//       await createAddress(newAddr);
+//       toast({ title: "Address added" });
+//       setNewAddr({
+//         label: "Home",
+//         line1: "",
+//         line2: "",
+//         city: "",
+//         state: "",
+//         zip_code: "",
+//         country: "IN",
+//         notes: "",
+//       });
+//       await load();
+
+//       // If user came from checkout, route back once they have at least 1 address
+//       if (returnTo) navigate(returnTo);
 //     } catch (err: any) {
-//       console.log("SAVE ERROR:", err.response?.data);
 //       toast({
-//         title: "Failed to save address",
-//         description: JSON.stringify(err.response?.data),
+//         title: "Failed to add address",
+//         description: err.response?.data
+//           ? JSON.stringify(err.response.data)
+//           : "Error",
 //         variant: "destructive",
 //       });
+//     }
+//   };
+
+//   const onDelete = async (id: string) => {
+//     try {
+//       await deleteAddress(id);
+//       toast({ title: "Address deleted" });
+//       await load();
+//     } catch {
+//       toast({ title: "Failed to delete address", variant: "destructive" });
+//     }
+//   };
+
+//   const onSetDefault = async (id: string) => {
+//     try {
+//       await setDefaultAddress(id);
+//       toast({ title: "Default address updated" });
+//       await load();
+//     } catch {
+//       toast({ title: "Failed to set default", variant: "destructive" });
 //     }
 //   };
 
@@ -651,7 +162,6 @@
 //   return (
 //     <div className="min-h-screen bg-background">
 //       <Header />
-
 //       <main className="pt-[188px] md:pt-[200px] pb-16 px-4">
 //         <div className="max-w-2xl mx-auto">
 //           <Link
@@ -703,54 +213,135 @@
 //                 )}
 //               </div>
 
-//               {/* ADDRESS */}
+//               {/* ADDRESSES */}
 //               <div className="space-y-3 border-t pt-4">
-//                 <div className="flex justify-between items-center">
-//                   <h3 className="font-semibold text-lg flex items-center gap-2">
-//                     <MapPin className="h-5 w-5" /> Address
-//                   </h3>
-//                   <Button
-//                     size="sm"
-//                     variant="outline"
-//                     onClick={() => setEditAddress(!editAddress)}
-//                   >
-//                     <Edit2 className="h-4 w-4 mr-1" />
-//                     {editAddress ? "Cancel" : "Edit"}
-//                   </Button>
-//                 </div>
+//                 <h3 className="font-semibold text-lg flex items-center gap-2">
+//                   <MapPin className="h-5 w-5" /> Addresses (max 3)
+//                 </h3>
 
-//                 <Label>Street</Label>
-//                 <Input
-//                   value={address}
-//                   disabled={!editAddress}
-//                   onChange={(e) => setAddress(e.target.value)}
-//                 />
+//                 {loadingAddr ? (
+//                   <p className="text-sm text-muted-foreground">
+//                     Loading addresses…
+//                   </p>
+//                 ) : (
+//                   <div className="space-y-3">
+//                     {addresses.length === 0 && (
+//                       <p className="text-sm text-muted-foreground">
+//                         No address found. Add one to continue checkout faster.
+//                       </p>
+//                     )}
 
-//                 <Label>City</Label>
-//                 <Input
-//                   value={city}
-//                   disabled={!editAddress}
-//                   onChange={(e) => setCity(e.target.value)}
-//                 />
+//                     {addresses.map((a) => (
+//                       <div
+//                         key={a.id}
+//                         className="border rounded p-3 flex gap-3 items-start"
+//                       >
+//                         <input
+//                           type="radio"
+//                           name="defaultAddress"
+//                           checked={a.id === defaultId}
+//                           onChange={() => onSetDefault(a.id)}
+//                           className="mt-1"
+//                         />
+//                         <div className="flex-1">
+//                           <p className="font-medium">
+//                             {a.label || "Address"}{" "}
+//                             {a.is_default ? "(Default)" : ""}
+//                           </p>
+//                           <p className="text-sm text-muted-foreground">
+//                             {a.line1}
+//                             {a.line2 ? `, ${a.line2}` : ""}, {a.city}, {a.state}{" "}
+//                             - {a.zip_code}
+//                           </p>
+//                         </div>
+//                         <Button
+//                           variant="ghost"
+//                           size="sm"
+//                           onClick={() => onDelete(a.id)}
+//                         >
+//                           <Trash2 className="h-4 w-4" />
+//                         </Button>
+//                       </div>
+//                     ))}
 
-//                 <Label>State</Label>
-//                 <Input
-//                   value={state}
-//                   disabled={!editAddress}
-//                   onChange={(e) => setState(e.target.value)}
-//                 />
+//                     <div className="border rounded p-3 space-y-2">
+//                       <div className="flex justify-between items-center">
+//                         <p className="font-medium">Add new address</p>
+//                         <Button
+//                           variant="outline"
+//                           size="sm"
+//                           disabled={!canAddMore}
+//                           onClick={onAddAddress}
+//                         >
+//                           <Plus className="h-4 w-4 mr-1" /> Add
+//                         </Button>
+//                       </div>
 
-//                 <Label>Zip</Label>
-//                 <Input
-//                   value={zip}
-//                   disabled={!editAddress}
-//                   onChange={(e) => setZip(e.target.value)}
-//                 />
+//                       {!canAddMore && (
+//                         <p className="text-sm text-muted-foreground">
+//                           You already saved 3 addresses. Delete one to add
+//                           another.
+//                         </p>
+//                       )}
 
-//                 {editAddress && (
-//                   <Button onClick={saveAddress} className="w-full mt-2">
-//                     <Save className="h-4 w-4 mr-2" /> Save Address
-//                   </Button>
+//                       <Input
+//                         placeholder="Label (Home/Work)"
+//                         value={newAddr.label}
+//                         onChange={(e) =>
+//                           setNewAddr({ ...newAddr, label: e.target.value })
+//                         }
+//                       />
+//                       <Input
+//                         placeholder="Address line 1"
+//                         value={newAddr.line1}
+//                         onChange={(e) =>
+//                           setNewAddr({ ...newAddr, line1: e.target.value })
+//                         }
+//                       />
+//                       <Input
+//                         placeholder="Address line 2 (optional)"
+//                         value={newAddr.line2}
+//                         onChange={(e) =>
+//                           setNewAddr({ ...newAddr, line2: e.target.value })
+//                         }
+//                       />
+//                       <div className="grid grid-cols-2 gap-2">
+//                         <Input
+//                           placeholder="City"
+//                           value={newAddr.city}
+//                           onChange={(e) =>
+//                             setNewAddr({ ...newAddr, city: e.target.value })
+//                           }
+//                         />
+//                         <Input
+//                           placeholder="State"
+//                           value={newAddr.state}
+//                           onChange={(e) =>
+//                             setNewAddr({ ...newAddr, state: e.target.value })
+//                           }
+//                         />
+//                       </div>
+//                       <div className="grid grid-cols-2 gap-2">
+//                         <Input
+//                           placeholder="Zip"
+//                           value={newAddr.zip_code}
+//                           onChange={(e) =>
+//                             setNewAddr({ ...newAddr, zip_code: e.target.value })
+//                           }
+//                         />
+//                         <Input
+//                           placeholder="Country (IN)"
+//                           value={newAddr.country}
+//                           onChange={(e) =>
+//                             setNewAddr({
+//                               ...newAddr,
+//                               country: e.target.value.toUpperCase(),
+//                             })
+//                           }
+//                         />
+//                       </div>
+//                     </div>
+//                   </div>
 //                 )}
 //               </div>
 
@@ -776,7 +367,6 @@
 //           </Card>
 //         </div>
 //       </main>
-
 //       <Footer />
 //     </div>
 //   );
@@ -784,9 +374,8 @@
 
 // export default Profile;
 
-
-import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import {
   Edit2,
   Save,
@@ -794,9 +383,11 @@ import {
   ShoppingBag,
   LogOut,
   MapPin,
+  Trash2,
+  Plus,
+  CheckCircle2,
+  Circle,
 } from "lucide-react";
-import axios from "axios";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -807,93 +398,171 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-/* ================================
-   API
-================================ */
-const API = "http://127.0.0.1:8000/api/auth/addresses/";
+import {
+  listAddresses,
+  createAddress,
+  deleteAddress,
+  setDefaultAddress,
+} from "@/api/addresses";
+import api from "@/lib/axios";
+
+type Address = {
+  id: string;
+  label?: string;
+  full_name?: string;
+  phone?: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  notes?: string;
+  is_default: boolean;
+};
 
 const Profile = () => {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const returnTo = params.get("return");
+
   const { user, updateUser, logout } = useAuth();
   const { toast } = useToast();
 
-  const token = localStorage.getItem("access");
-
   const [editProfile, setEditProfile] = useState(false);
-  const [editAddress, setEditAddress] = useState(false);
-
   const [name, setName] = useState(user?.name || "");
   const [phone, setPhone] = useState(user?.phone || "");
 
-  const [address, setAddress] = useState("");
-  const [city, setCity] = useState("");
-  const [state, setState] = useState("");
-  const [zip, setZip] = useState("");
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [loadingAddr, setLoadingAddr] = useState(true);
 
-  /* ================================
-     LOAD ADDRESS
-  ================================ */
-  useEffect(() => {
-    if (!token) return;
+  // New address form
+  const [newAddr, setNewAddr] = useState({
+    label: "Home",
+    line1: "",
+    line2: "",
+    city: "",
+    state: "",
+    zip_code: "",
+    country: "IN",
+    notes: "",
+  });
 
-    axios
-      .get(API, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        if (res.data.length > 0) {
-          const a = res.data[0];
-          setAddress(a.address);
-          setCity(a.city);
-          setState(a.state);
-          setZip(a.zip);
-        }
-      })
-      .catch((err) => {
-        console.log("LOAD ADDRESS ERROR:", err.response?.data);
-      });
-  }, [token]);
+  const canAddMore = addresses.length < 3;
 
-  const saveProfile = () => {
-    updateUser({ name, phone });
-    setEditProfile(false);
-    toast({ title: "Profile updated" });
+  // Sorting: Default address always on top
+  const sortedAddresses = useMemo(() => {
+    return [...addresses].sort((a, b) =>
+      a.is_default === b.is_default ? 0 : a.is_default ? -1 : 1,
+    );
+  }, [addresses]);
+
+  const load = async () => {
+    try {
+      setLoadingAddr(true);
+      const data = await listAddresses();
+      setAddresses(data);
+    } catch (e: any) {
+      toast({ title: "Failed to load addresses", variant: "destructive" });
+    } finally {
+      setLoadingAddr(false);
+    }
   };
 
-  /* ================================
-     SAVE ADDRESS
-  ================================ */
-  const saveAddress = async () => {
+  useEffect(() => {
+    load();
+  }, []);
+
+  // Sync state when user loads
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setPhone(user.phone || "");
+    }
+  }, [user]);
+
+  // const saveProfile = () => {
+  //   updateUser({ name, phone });
+  //   setEditProfile(false);
+  //   toast({ title: "Profile updated" });
+  // };
+  const saveProfile = async () => {
     try {
-      if (!token) throw new Error("No token found");
+      // 1. Call Backend API
+      const res = await api.put("auth/profile/update/", {
+        name: name,
+        phone: phone,
+      });
 
-      await axios.post(
-        API,
-        { address, city, state, zip },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // 2. Update Context/Local Storage
+      const updatedUser = {
+        ...user!,
+        name: res.data.full_name, // Map back from backend response
+        phone: res.data.phone,
+      };
 
-      setEditAddress(false);
-      toast({ title: "Address saved successfully" });
-    } catch (err: any) {
-      console.log("SAVE ERROR:", err.response?.data);
+      updateUser(updatedUser); // This function from AuthContext needs to update state & localStorage
+      setEditProfile(false);
+      toast({ title: "Profile updated successfully" });
+    } catch (err) {
+      console.error(err);
       toast({
-        title: "Failed to save address",
-        description: JSON.stringify(err.response?.data),
+        title: "Failed to update profile",
         variant: "destructive",
       });
+    }
+  };
+  const onAddAddress = async () => {
+    try {
+      if (!canAddMore) return;
+      await createAddress(newAddr);
+      toast({ title: "Address added" });
+      setNewAddr({
+        label: "Home",
+        line1: "",
+        line2: "",
+        city: "",
+        state: "",
+        zip_code: "",
+        country: "IN",
+        notes: "",
+      });
+      await load();
+
+      if (returnTo) navigate(returnTo);
+    } catch (err: any) {
+      toast({
+        title: "Failed to add address",
+        description: err.response?.data
+          ? JSON.stringify(err.response.data)
+          : "Error",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onDelete = async (id: string) => {
+    try {
+      await deleteAddress(id);
+      toast({ title: "Address deleted" });
+      await load();
+    } catch {
+      toast({ title: "Failed to delete address", variant: "destructive" });
+    }
+  };
+
+  const onSetDefault = async (id: string) => {
+    try {
+      await setDefaultAddress(id);
+      toast({ title: "Default address updated" });
+      await load();
+    } catch {
+      toast({ title: "Failed to set default", variant: "destructive" });
     }
   };
 
@@ -907,9 +576,9 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
       <main className="pt-[188px] md:pt-[200px] pb-16 px-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
+          <br />
           <Link
             to="/"
             className="inline-flex items-center mb-6 text-muted-foreground hover:text-foreground"
@@ -918,121 +587,252 @@ const Profile = () => {
           </Link>
 
           <Card className="shadow-lg border-2">
-            <CardHeader className="text-center border-b">
-              <CardTitle>{user.name}</CardTitle>
+            <CardHeader className="text-center border-b bg-muted/20">
+              <CardTitle className="text-2xl">{name || user.email}</CardTitle>
               <CardDescription>{user.email}</CardDescription>
             </CardHeader>
 
-            <CardContent className="space-y-6 pt-6">
-              {/* PROFILE */}
-              <div className="space-y-3">
+            <CardContent className="space-y-8 pt-6">
+              {/* PROFILE SECTION */}
+              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-lg">Profile</h3>
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Edit2 className="h-4 w-4" /> Personal Details
+                  </h3>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant={editProfile ? "secondary" : "outline"}
                     onClick={() => setEditProfile(!editProfile)}
                   >
-                    <Edit2 className="h-4 w-4 mr-1" />
                     {editProfile ? "Cancel" : "Edit"}
                   </Button>
                 </div>
 
-                <Label>Name</Label>
-                <Input
-                  value={name}
-                  disabled={!editProfile}
-                  onChange={(e) => setName(e.target.value)}
-                />
-
-                <Label>Phone</Label>
-                <Input
-                  value={phone}
-                  disabled={!editProfile}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-
-                {editProfile && (
-                  <Button onClick={saveProfile} className="w-full mt-2">
-                    <Save className="h-4 w-4 mr-2" /> Save Profile
-                  </Button>
-                )}
-              </div>
-
-              {/* ADDRESS */}
-              <div className="space-y-3 border-t pt-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold text-lg flex items-center gap-2">
-                    <MapPin className="h-5 w-5" /> Address
-                  </h3>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setEditAddress(!editAddress)}
-                  >
-                    <Edit2 className="h-4 w-4 mr-1" />
-                    {editAddress ? "Cancel" : "Edit"}
-                  </Button>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Full Name</Label>
+                    <Input
+                      value={name}
+                      disabled={!editProfile}
+                      onChange={(e) => setName(e.target.value)}
+                      className={editProfile ? "bg-background" : "bg-muted/50"}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Phone Number</Label>
+                    <Input
+                      value={phone}
+                      disabled={!editProfile}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className={editProfile ? "bg-background" : "bg-muted/50"}
+                    />
+                  </div>
                 </div>
 
-                <Label>Street</Label>
-                <Input
-                  value={address}
-                  disabled={!editAddress}
-                  onChange={(e) => setAddress(e.target.value)}
-                />
-
-                <Label>City</Label>
-                <Input
-                  value={city}
-                  disabled={!editAddress}
-                  onChange={(e) => setCity(e.target.value)}
-                />
-
-                <Label>State</Label>
-                <Input
-                  value={state}
-                  disabled={!editAddress}
-                  onChange={(e) => setState(e.target.value)}
-                />
-
-                <Label>Zip</Label>
-                <Input
-                  value={zip}
-                  disabled={!editAddress}
-                  onChange={(e) => setZip(e.target.value)}
-                />
-
-                {editAddress && (
-                  <Button onClick={saveAddress} className="w-full mt-2">
-                    <Save className="h-4 w-4 mr-2" /> Save Address
+                {editProfile && (
+                  <Button onClick={saveProfile} className="w-full md:w-auto">
+                    <Save className="h-4 w-4 mr-2" /> Save Changes
                   </Button>
                 )}
               </div>
 
-              {/* QUICK LINKS */}
-              <div className="pt-6 border-t space-y-3">
+              {/* ADDRESS SECTION */}
+              <div className="space-y-4 border-t pt-6">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <MapPin className="h-5 w-5" /> Saved Addresses
+                  <span className="text-sm font-normal text-muted-foreground ml-auto">
+                    {addresses.length}/3 used
+                  </span>
+                </h3>
+
+                {loadingAddr ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Loading addresses...
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {sortedAddresses.length === 0 && (
+                      <div className="text-center py-8 border-2 border-dashed rounded-lg">
+                        <p className="text-muted-foreground mb-2">
+                          No addresses saved yet
+                        </p>
+                      </div>
+                    )}
+
+                    {sortedAddresses.map((a) => (
+                      <div
+                        key={a.id}
+                        onClick={() => !a.is_default && onSetDefault(a.id)}
+                        className={`
+                          group relative border-2 rounded-xl p-4 transition-all cursor-pointer
+                          ${
+                            a.is_default
+                              ? "border-primary bg-primary/5 shadow-sm"
+                              : "border-border hover:border-primary/50 hover:bg-accent/50"
+                          }
+                        `}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`mt-1 ${a.is_default ? "text-primary" : "text-muted-foreground"}`}
+                          >
+                            {a.is_default ? (
+                              <CheckCircle2 className="h-5 w-5 fill-current" />
+                            ) : (
+                              <Circle className="h-5 w-5" />
+                            )}
+                          </div>
+
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold">
+                                {a.label || "Address"}
+                              </span>
+                              {a.is_default && (
+                                <span className="text-[10px] uppercase font-bold tracking-wider bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm leading-relaxed text-foreground/90">
+                              {a.line1}
+                              {a.line2 && <>, {a.line2}</>}
+                              <br />
+                              {a.city}, {a.state} - {a.zip_code}
+                            </p>
+                          </div>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 -mt-1 -mr-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(a.id);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* ADD NEW ADDRESS FORM */}
+                    <div className="pt-4">
+                      {canAddMore ? (
+                        <div className="border rounded-xl p-4 space-y-4 bg-muted/10">
+                          <h4 className="font-medium flex items-center gap-2">
+                            <Plus className="h-4 w-4" /> Add New Address
+                          </h4>
+
+                          <div className="grid gap-3">
+                            <Input
+                              placeholder="Label (e.g. Home, Work)"
+                              value={newAddr.label}
+                              onChange={(e) =>
+                                setNewAddr({
+                                  ...newAddr,
+                                  label: e.target.value,
+                                })
+                              }
+                            />
+                            <Input
+                              placeholder="Street Address Line 1"
+                              value={newAddr.line1}
+                              onChange={(e) =>
+                                setNewAddr({
+                                  ...newAddr,
+                                  line1: e.target.value,
+                                })
+                              }
+                            />
+                            <Input
+                              placeholder="Line 2 (Optional)"
+                              value={newAddr.line2}
+                              onChange={(e) =>
+                                setNewAddr({
+                                  ...newAddr,
+                                  line2: e.target.value,
+                                })
+                              }
+                            />
+                            <div className="grid grid-cols-2 gap-3">
+                              <Input
+                                placeholder="City"
+                                value={newAddr.city}
+                                onChange={(e) =>
+                                  setNewAddr({
+                                    ...newAddr,
+                                    city: e.target.value,
+                                  })
+                                }
+                              />
+                              <Input
+                                placeholder="State"
+                                value={newAddr.state}
+                                onChange={(e) =>
+                                  setNewAddr({
+                                    ...newAddr,
+                                    state: e.target.value,
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                              <Input
+                                placeholder="Zip Code"
+                                value={newAddr.zip_code}
+                                onChange={(e) =>
+                                  setNewAddr({
+                                    ...newAddr,
+                                    zip_code: e.target.value,
+                                  })
+                                }
+                              />
+                              <Input
+                                placeholder="Country"
+                                value={newAddr.country}
+                                readOnly
+                                className="bg-muted"
+                              />
+                            </div>
+                            <Button onClick={onAddAddress} className="w-full">
+                              Add Address
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm text-center border border-yellow-200">
+                          Maximum limit reached (3 addresses). Delete one to add
+                          another.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* ACTION BUTTONS */}
+              <div className="pt-6 border-t flex flex-col sm:flex-row gap-3">
                 <Button
                   variant="outline"
-                  className="w-full justify-start"
+                  className="flex-1"
                   onClick={() => navigate("/orders")}
                 >
-                  <ShoppingBag className="h-5 w-5 mr-3" /> My Orders
+                  <ShoppingBag className="h-4 w-4 mr-2" /> Order History
                 </Button>
-
                 <Button
-                  variant="outline"
-                  className="w-full justify-start text-destructive"
+                  variant="destructive"
+                  className="flex-1"
                   onClick={handleLogout}
                 >
-                  <LogOut className="h-5 w-5 mr-3" /> Logout
+                  <LogOut className="h-4 w-4 mr-2" /> Sign Out
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </main>
-
       <Footer />
     </div>
   );

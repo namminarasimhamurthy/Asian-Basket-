@@ -1,0 +1,669 @@
+// import { useState } from 'react';
+// import { Link, useNavigate } from 'react-router-dom';
+// import { Menu, Heart, ShoppingBag, User, LogOut, Package, MapPin, Phone } from 'lucide-react';
+// import { Button } from '@/components/ui/button';
+// import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
+// import { useCart } from '@/contexts/CartContext';
+// import { useAuth } from '@/contexts/AuthContext';
+// import Cart from './Cart';
+// import MegaMenu from './MegaMenu';
+// import SearchBar from './SearchBar';
+// import asianBasketLogo from '@/assets/asian-basket-logo-light.jpg';
+
+// const Header = () => {
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+//   const { cartItems } = useCart();
+//   const { user, isAuthenticated, logout } = useAuth();
+//   const navigate = useNavigate();
+
+//   const handleLogout = () => {
+//     logout();
+//     navigate('/');
+//   };
+
+//   return (
+//     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-card shadow-sm border-b border-border">
+//       {/* 1. Announcement Bar */}
+//       <div className="bg-primary text-primary-foreground py-1.5 px-4 text-xs font-medium overflow-hidden marquee-container">
+//         <div className="animate-marquee">
+//           <span className="sm:hidden">🚚 Free Delivery in Dublin (€39.99+) • Fresh Indian & Asian Groceries • Order Now!</span>
+//           <span className="hidden sm:inline">🚚 Free Delivery available within Dublin for the orders on and above €39.99 • Fresh Indian & Asian Groceries Delivered to Your Door • Order Now!</span>
+//         </div>
+//       </div>
+
+//       {/* 2. Main Header */}
+//       <div className="container mx-auto px-4 py-3 md:py-4">
+//         <div className="flex items-center justify-between gap-4">
+
+//           {/* Logo & Mobile Menu */}
+//           <div className="flex items-center gap-3">
+//             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+//               <SheetTrigger asChild>
+//                 <Button variant="ghost" size="icon" className="md:hidden">
+//                   <Menu className="h-6 w-6" />
+//                 </Button>
+//               </SheetTrigger>
+//               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+//                 <nav className="flex flex-col gap-4 mt-8">
+//                   <Link to="/" className="text-lg font-bold text-primary" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+//                   <Link to="/orders" className="text-lg font-medium" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+//                   <Link to="/offers" className="text-lg font-medium" onClick={() => setIsMobileMenuOpen(false)}>Special Offers</Link>
+//                   <Link to="/search?q=Festival" className="text-lg font-medium" onClick={() => setIsMobileMenuOpen(false)}>Festival Season</Link>
+//                   <Link to="/search?q=Indian Fruits" className="text-lg font-medium" onClick={() => setIsMobileMenuOpen(false)}>Indian Fruits</Link>
+//                   <hr />
+//                   <div className="space-y-2">
+//                     <p className="text-sm font-semibold text-muted-foreground uppercase">Categories</p>
+//                     <Link to="/category/fruits-veg" className="block py-2" onClick={() => setIsMobileMenuOpen(false)}>Fruits & Vegetables</Link>
+//                     <Link to="/category/meat" className="block py-2" onClick={() => setIsMobileMenuOpen(false)}>Meat & Poultry</Link>
+//                     <Link to="/category/seafood" className="block py-2" onClick={() => setIsMobileMenuOpen(false)}>Seafood</Link>
+//                     <Link to="/category/staples" className="block py-2" onClick={() => setIsMobileMenuOpen(false)}>Rice & Flour</Link>
+//                     <Link to="/category/dairy" className="block py-2" onClick={() => setIsMobileMenuOpen(false)}>Dairy & Bakery</Link>
+//                     <Link to="/category/snacks" className="block py-2" onClick={() => setIsMobileMenuOpen(false)}>Snacks & Drinks</Link>
+//                   </div>
+//                   <hr />
+//                   <div className="space-y-2">
+//                     <p className="text-sm font-semibold text-muted-foreground uppercase">Get in Touch</p>
+//                     <Link to="/contact" className="block py-2 text-lg font-medium" onClick={() => setIsMobileMenuOpen(false)}>Contact Us</Link>
+//                     <a href="tel:+353899899412" className="flex items-center gap-2 py-2 text-primary font-medium">
+//                       <Phone className="h-5 w-5" />
+//                       +353 899899412
+//                     </a>
+//                   </div>
+//                 </nav>
+//               </SheetContent>
+//             </Sheet>
+
+//             <Link to="/" className="flex items-center gap-2 group">
+//               <img
+//                 src={asianBasketLogo}
+//                 alt="Asian Basket - Fresh Organic Authentic"
+//                 className="h-20 md:h-24 w-auto object-contain group-hover:scale-105 transition-transform"
+//               />
+//             </Link>
+//           </div>
+
+//           {/* Search Bar - Hidden on small mobile, visible on desktop */}
+//           <div className="hidden md:flex flex-1 justify-center">
+//             <SearchBar />
+//           </div>
+
+//           {/* User Actions */}
+//           <div className="flex items-center gap-1 md:gap-3">
+//             {/* Wishlist - Hidden on mobile */}
+//             <Button variant="ghost" size="icon" className="hidden md:inline-flex text-muted-foreground hover:text-primary hover:bg-secondary">
+//               <Heart className="h-5 w-5" />
+//             </Button>
+           
+//             {/* Account */}
+//             {isAuthenticated ? (
+//               <DropdownMenu>
+//                 <DropdownMenuTrigger asChild>
+//                   <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-3 bg-secondary/50 hover:bg-secondary text-primary rounded-full">
+//                     <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+//                       {user?.name?.[0].toUpperCase()}
+//                     </div>
+//                     <span className="hidden lg:inline-block max-w-[100px] truncate text-sm font-medium">
+//                       {user?.name}
+//                     </span>
+//                   </Button>
+//                 </DropdownMenuTrigger>
+//                 <DropdownMenuContent align="end" className="w-56">
+//                   <div className="px-2 py-1.5 text-sm font-semibold text-muted-foreground">
+//                     My Account
+//                   </div>
+//                   <DropdownMenuSeparator />
+//                   <DropdownMenuItem onClick={() => navigate('/profile')}>
+//                     <User className="mr-2 h-4 w-4" /> Profile
+//                   </DropdownMenuItem>
+//                   <DropdownMenuItem onClick={() => navigate('/orders')}>
+//                     <Package className="mr-2 h-4 w-4" /> My Orders
+//                   </DropdownMenuItem>
+//                   <DropdownMenuItem onClick={() => navigate('/profile')}>
+//                     <MapPin className="mr-2 h-4 w-4" /> Addresses
+//                   </DropdownMenuItem>
+//                   <DropdownMenuSeparator />
+//                   <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+//                     <LogOut className="mr-2 h-4 w-4" /> Logout
+//                   </DropdownMenuItem>
+//                 </DropdownMenuContent>
+//               </DropdownMenu>
+//             ) : (
+//               <Link to="/login">
+//                 <Button variant="ghost" className="hidden md:inline-flex items-center gap-2 font-medium hover:text-primary">
+//                   <User className="h-5 w-5" />
+//                   <span>Login</span>
+//                 </Button>
+//               </Link>
+//             )}
+
+//             {/* Cart Trigger */}
+//             <Button
+//               onClick={() => setIsCartOpen(true)}
+//               className="relative bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-4 md:px-5 h-10 md:h-11 shadow-md hover:shadow-lg transition-all"
+//             >
+//               <ShoppingBag className="h-5 w-5 md:mr-2" />
+//               <span className="hidden md:inline font-bold">My Cart</span>
+//               {cartItems.length > 0 && (
+//                 <span className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs font-bold px-2 py-0.5 rounded-full border-2 border-background min-w-[20px]">
+//                   {cartItems.length}
+//                 </span>
+//               )}
+//             </Button>
+//           </div>
+//         </div>
+
+//         {/* Search Bar - Mobile Only */}
+//         <div className="mt-3 md:hidden">
+//           <SearchBar />
+//         </div>
+//       </div>
+
+//       {/* 3. Mega Menu (Desktop only) */}
+//       <MegaMenu />
+
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </header>
+//   );
+// };
+
+// export default Header;
+
+// import { useState, useEffect } from 'react';
+// import { Link, useNavigate } from 'react-router-dom';
+// import { Menu, Heart, ShoppingBag, User, LogOut, Package, MapPin, Phone } from 'lucide-react';
+// import { Button } from '@/components/ui/button';
+// import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
+// import { useCart } from '@/contexts/CartContext';
+// import { useAuth } from '@/contexts/AuthContext';
+// import Cart from './Cart';
+// import MegaMenu from './MegaMenu';
+// import SearchBar from './SearchBar';
+// import asianBasketLogo from '@/assets/asian-basket-logo-light.jpg';
+
+// const Header = () => {
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+//   const { cartItems } = useCart();
+//   const { user, isAuthenticated, logout } = useAuth();
+//   const navigate = useNavigate();
+
+//   // 🔍 AUTH DEBUG LOGS
+//   useEffect(() => {
+//     console.log('HEADER AUTH STATE:', {
+//       user,
+//       isAuthenticated,
+//     });
+//   }, [user, isAuthenticated]);
+
+//   const handleLogout = () => {
+//     console.log('LOGOUT CLICKED');
+//     logout();
+//     navigate('/');
+//   };
+
+//   return (
+//     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-card shadow-sm border-b border-border">
+//       {/* 1. Announcement Bar */}
+//       <div className="bg-primary text-primary-foreground py-1.5 px-4 text-xs font-medium overflow-hidden marquee-container">
+//         <div className="animate-marquee">
+//           <span className="sm:hidden">
+//             🚚 Free Delivery in Dublin (€39.99+) • Fresh Indian & Asian Groceries • Order Now!
+//           </span>
+//           <span className="hidden sm:inline">
+//             🚚 Free Delivery available within Dublin for the orders on and above €39.99 • Fresh Indian & Asian Groceries Delivered to Your Door • Order Now!
+//           </span>
+//         </div>
+//       </div>
+
+//       {/* 2. Main Header */}
+//       <div className="container mx-auto px-4 py-3 md:py-4">
+//         <div className="flex items-center justify-between gap-4">
+
+//           {/* Logo & Mobile Menu */}
+//           <div className="flex items-center gap-3">
+//             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+//               <SheetTrigger asChild>
+//                 <Button variant="ghost" size="icon" className="md:hidden">
+//                   <Menu className="h-6 w-6" />
+//                 </Button>
+//               </SheetTrigger>
+//               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+//                 <nav className="flex flex-col gap-4 mt-8">
+//                   <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+//                   <Link to="/orders" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+//                 </nav>
+//               </SheetContent>
+//             </Sheet>
+
+//             <Link to="/" className="flex items-center gap-2 group">
+//               <img
+//                 src={asianBasketLogo}
+//                 alt="Asian Basket"
+//                 className="h-20 md:h-24 w-auto"
+//               />
+//             </Link>
+//           </div>
+
+//           {/* User Actions */}
+//           <div className="flex items-center gap-3">
+//             {isAuthenticated ? (
+//               <Button onClick={handleLogout}>
+//                 Logout
+//               </Button>
+//             ) : (
+//               <Link to="/login">
+//                 <Button>Login</Button>
+//               </Link>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+
+//       <MegaMenu />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </header>
+//   );
+// };
+
+// export default Header;
+
+
+// import { useState, useEffect } from 'react';
+// import { Link, useNavigate } from 'react-router-dom';
+// import {
+//   Menu,
+//   Heart,
+//   ShoppingBag,
+//   User,
+//   LogOut,
+//   Package,
+//   MapPin,
+//   Phone,
+// } from 'lucide-react';
+// import axios from 'axios';
+
+// import { Button } from '@/components/ui/button';
+// import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+// import {
+//   DropdownMenu,
+//   DropdownMenuContent,
+//   DropdownMenuItem,
+//   DropdownMenuSeparator,
+//   DropdownMenuTrigger,
+// } from '@/components/ui/dropdown-menu';
+
+// import { useCart } from '@/contexts/CartContext';
+// import { useAuth } from '@/contexts/AuthContext';
+// import Cart from './Cart';
+// import MegaMenu from './MegaMenu';
+// import SearchBar from './SearchBar';
+// import asianBasketLogo from '@/assets/asian-basket-logo-light.jpg';
+
+// const Header = () => {
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+//   const [announcements, setAnnouncements] = useState<string[]>([]);
+
+//   const { cartItems } = useCart();
+//   const { user, isAuthenticated, logout } = useAuth();
+//   const navigate = useNavigate();
+
+//   /* ================================
+//      FETCH ANNOUNCEMENTS
+//   ================================ */
+//   useEffect(() => {
+//     axios
+//       .get('http://127.0.0.1:8000/api/auth/announcement/')
+//       .then((res) => {
+//         if (Array.isArray(res.data) && res.data.length > 0) {
+//           setAnnouncements(res.data.map((item) => item.description));
+//         } else {
+//           setAnnouncements([]);
+//         }
+//       })
+//       .catch(() => {
+//         setAnnouncements([]);
+//       });
+//   }, []);
+
+//   const handleLogout = () => {
+//     logout();
+//     navigate('/');
+//   };
+
+//   return (
+//     <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-card shadow-sm border-b border-border">
+//       {/* ================================
+//           1. ANNOUNCEMENT BAR (API)
+//       ================================ */}
+//       <div className="bg-primary text-primary-foreground py-1.5 px-4 text-xs font-medium overflow-hidden marquee-container">
+//         <div className="animate-marquee">
+//           {announcements.length > 0 ? (
+//             <>
+//               <span className="sm:hidden">
+//                 {announcements.join(' • ')}
+//               </span>
+//               <span className="hidden sm:inline">
+//                 {announcements.join(' • ')}
+//               </span>
+//             </>
+//           ) : (
+//             <>
+//               <span className="sm:hidden">
+//                 🚚 Free Delivery in Dublin (€39.99+) • Fresh Indian & Asian Groceries • Order Now!
+//               </span>
+//               <span className="hidden sm:inline">
+//                 🚚 Free Delivery available within Dublin for orders above €39.99 • Fresh Indian & Asian Groceries Delivered to Your Door • Order Now!
+//               </span>
+//             </>
+//           )}
+//         </div>
+//       </div>
+
+//       {/* ================================
+//           2. MAIN HEADER
+//       ================================ */}
+//       <div className="container mx-auto px-4 py-3 md:py-4">
+//         <div className="flex items-center justify-between gap-4">
+//           {/* Logo & Mobile Menu */}
+//           <div className="flex items-center gap-3">
+//             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+//               <SheetTrigger asChild>
+//                 <Button variant="ghost" size="icon" className="md:hidden">
+//                   <Menu className="h-6 w-6" />
+//                 </Button>
+//               </SheetTrigger>
+//               <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+//                 <nav className="flex flex-col gap-4 mt-8">
+//                   <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+//                   <Link to="/orders" onClick={() => setIsMobileMenuOpen(false)}>My Orders</Link>
+//                   <Link to="/offers" onClick={() => setIsMobileMenuOpen(false)}>Special Offers</Link>
+//                 </nav>
+//               </SheetContent>
+//             </Sheet>
+
+//             <Link to="/" className="flex items-center gap-2">
+//               <img
+//                 src={asianBasketLogo}
+//                 alt="Asian Basket"
+//                 className="h-20 md:h-24 object-contain"
+//               />
+//             </Link>
+//           </div>
+
+//           {/* Search Bar */}
+//           <div className="hidden md:flex flex-1 justify-center">
+//             <SearchBar />
+//           </div>
+
+//           {/* User Actions */}
+//           <div className="flex items-center gap-2">
+//             {isAuthenticated ? (
+//               <DropdownMenu>
+//                 <DropdownMenuTrigger asChild>
+//                   <Button variant="ghost" className="flex items-center gap-2">
+//                     <User className="h-5 w-5" />
+//                     {user?.name}
+//                   </Button>
+//                 </DropdownMenuTrigger>
+//                 <DropdownMenuContent align="end">
+//                   <DropdownMenuItem onClick={() => navigate('/profile')}>
+//                     <User className="mr-2 h-4 w-4" /> Profile
+//                   </DropdownMenuItem>
+//                   <DropdownMenuSeparator />
+//                   <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+//                     <LogOut className="mr-2 h-4 w-4" /> Logout
+//                   </DropdownMenuItem>
+//                 </DropdownMenuContent>
+//               </DropdownMenu>
+//             ) : (
+//               <Link to="/login">
+//                 <Button variant="ghost">
+//                   <User className="h-5 w-5 mr-1" /> Login
+//                 </Button>
+//               </Link>
+//             )}
+
+//             {/* Cart */}
+//             <Button
+//               onClick={() => setIsCartOpen(true)}
+//               className="relative bg-primary text-primary-foreground rounded-full px-4"
+//             >
+//               <ShoppingBag className="h-5 w-5" />
+//               {cartItems.length > 0 && (
+//                 <span className="absolute -top-2 -right-2 bg-accent text-xs font-bold px-2 rounded-full">
+//                   {cartItems.length}
+//                 </span>
+//               )}
+//             </Button>
+//           </div>
+//         </div>
+
+//         {/* Mobile Search */}
+//         <div className="mt-3 md:hidden">
+//           <SearchBar />
+//         </div>
+//       </div>
+
+//       {/* ================================
+//           3. MEGA MENU
+//       ================================ */}
+//       <MegaMenu />
+
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </header>
+//   );
+// };
+
+// export default Header;
+
+
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, ShoppingBag, User, LogOut } from "lucide-react";
+import axios from "axios";
+
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import Cart from "./Cart";
+import MegaMenu from "./MegaMenu";
+import SearchBar from "./SearchBar";
+import asianBasketLogo from "@/assets/asian-basket-logo-light.jpg";
+
+/* ================================
+   DEFAULT ANNOUNCEMENTS
+================================ */
+const DEFAULT_ANNOUNCEMENTS = [
+  "🚚 Free Delivery available within Dublin for orders above €39.99",
+  "🥦 Fresh Indian & Asian Groceries",
+  "🛒 Order Now!",
+];
+
+const Header = () => {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<string[]>([]);
+
+  const { cartItems } = useCart();
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  /* ================================
+     FETCH ANNOUNCEMENTS
+  ================================ */
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/auth/announcement/")
+      .then((res) => {
+        if (Array.isArray(res.data) && res.data.length > 0) {
+          setAnnouncements(res.data.map((a) => a.description));
+        } else {
+          setAnnouncements(DEFAULT_ANNOUNCEMENTS);
+        }
+      })
+      .catch(() => {
+        setAnnouncements(DEFAULT_ANNOUNCEMENTS);
+      });
+  }, []);
+
+  /* ================================
+     REPEAT FOR INFINITE SCROLL
+  ================================ */
+  const scrollingAnnouncements = [
+    ...announcements,
+    ...announcements,
+    ...announcements, // extra repeat = smoother loop
+  ];
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white border-b shadow-sm">
+      {/* ================================
+          ANNOUNCEMENT MARQUEE
+      ================================ */}
+      <div className="bg-primary text-primary-foreground py-2 overflow-hidden">
+        <div className="flex w-max animate-marquee">
+          {scrollingAnnouncements.map((text, index) => (
+            <span
+              key={index}
+              className="mx-12 text-xs md:text-sm font-semibold whitespace-nowrap"
+            >
+              {text}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* ================================
+          MAIN HEADER
+      ================================ */}
+      <div className="container mx-auto px-4 py-3 md:py-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Logo + Mobile Menu */}
+          <div className="flex items-center gap-3">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="md:hidden">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px]">
+                <nav className="flex flex-col gap-4 mt-8">
+                  <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+                    Home
+                  </Link>
+                  <Link to="/orders" onClick={() => setIsMobileMenuOpen(false)}>
+                    My Orders
+                  </Link>
+                  <Link to="/offers" onClick={() => setIsMobileMenuOpen(false)}>
+                    Offers
+                  </Link>
+                </nav>
+              </SheetContent>
+            </Sheet>
+
+            <Link to="/">
+              <img
+                src={asianBasketLogo}
+                alt="Asian Basket"
+                className="h-20 md:h-24 object-contain"
+              />
+            </Link>
+          </div>
+
+          {/* Search */}
+          <div className="hidden md:flex flex-1 justify-center">
+            <SearchBar />
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost">
+                    <User className="h-5 w-5 mr-1" />
+                    {user?.name}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-destructive"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button variant="ghost">
+                  <User className="h-5 w-5 mr-1" />
+                  Login
+                </Button>
+              </Link>
+            )}
+
+            {/* Cart */}
+            <Button
+              onClick={() => setIsCartOpen(true)}
+              className="relative bg-primary text-primary-foreground rounded-full px-4"
+            >
+              <ShoppingBag className="h-5 w-5" />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-accent text-xs font-bold px-2 rounded-full">
+                  {cartItems.length}
+                </span>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Search */}
+        <div className="mt-3 md:hidden">
+          <SearchBar />
+        </div>
+      </div>
+
+      <MegaMenu />
+      <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+    </header>
+  );
+};
+
+export default Header;
