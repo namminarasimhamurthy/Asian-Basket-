@@ -2508,8 +2508,781 @@
 
 // export default CategorySection;
 
+// import { useRef, useState } from "react";
+// import { ChevronLeft, ChevronRight, Plus, Eye, X } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useCart } from "@/contexts/CartContext";
+// import { useToast } from "@/hooks/use-toast";
+// import { Link } from "react-router-dom";
+// import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface WeightOption {
+//   weight: string;
+//   label: string;
+// }
+
+// interface Product {
+//   id: string;
+//   name: string;
+//   price: number;       // selling price
+//   mrp?: number;        // original price
+//   image: string;
+//   category: string;
+//   in_stock: boolean;
+//   priority?: number;
+//   pricePerKg?: number;
+//   availableWeights?: WeightOption[];
+// }
+
+// interface CategorySectionProps {
+//   title: string;
+//   products: Product[];
+//   bgColor?: string;
+//   categorySlug: string;
+// }
+
+// /* ================================
+//    COMPONENT
+// ================================ */
+// const CategorySection = ({
+//   title,
+//   products,
+//   bgColor = "bg-white",
+//   categorySlug,
+// }: CategorySectionProps) => {
+//   const scrollRef = useRef<HTMLDivElement>(null);
+//   const { addToCart } = useCart();
+//   const { toast } = useToast();
+
+//   const [selectedWeights, setSelectedWeights] = useState<Record<string, string>>(
+//     {}
+//   );
+//   const [quickViewProduct, setQuickViewProduct] =
+//     useState<Product | null>(null);
+
+//   /* ================================
+//      PRIORITY SORT
+//   ================================ */
+//   const sortedProducts = [...products].sort((a, b) => {
+//     const pa = a.priority ?? 0;
+//     const pb = b.priority ?? 0;
+
+//     if (pa === 0 && pb === 0) return 0;
+//     if (pa === 0) return 1;
+//     if (pb === 0) return -1;
+//     return pa - pb;
+//   });
+
+//   const calculatePrice = (product: Product) => {
+//     if (!product.pricePerKg || !product.availableWeights)
+//       return product.price;
+
+//     const selectedWeight =
+//       selectedWeights[product.id] ||
+//       product.availableWeights[0]?.weight ||
+//       "1";
+
+//     return product.pricePerKg * parseFloat(selectedWeight);
+//   };
+
+//   const calculateDiscount = (mrp?: number, price?: number) => {
+//     if (!mrp || !price || mrp <= price) return null;
+//     return Math.round(((mrp - price) / mrp) * 100);
+//   };
+
+//   const handleAddToCart = (product: Product) => {
+//     if (!product.in_stock) return;
+
+//     addToCart({
+//       ...product,
+//       price: calculatePrice(product),
+//     });
+
+//     toast({
+//       title: "Added to cart",
+//       description: `${product.name} added successfully`,
+//     });
+//   };
+
+//   const scroll = (direction: "left" | "right") => {
+//     if (!scrollRef.current) return;
+
+//     const scrollAmount = scrollRef.current.clientWidth * 0.8;
+//     scrollRef.current.scrollBy({
+//       left: direction === "left" ? -scrollAmount : scrollAmount,
+//       behavior: "smooth",
+//     });
+//   };
+
+//   return (
+//     <>
+//       <section className={`py-12 ${bgColor}`}>
+//         <div className="container mx-auto px-4">
+//           <div className="flex items-center justify-between mb-6">
+//             <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+//               {title}
+//             </h2>
+
+//             <div className="flex items-center gap-2">
+//               <Link
+//                 to={`/category/${categorySlug}`}
+//                 className="text-sm font-semibold text-primary hover:underline mr-2 hidden sm:block"
+//               >
+//                 View All
+//               </Link>
+
+//               <Button variant="outline" size="icon" onClick={() => scroll("left")}>
+//                 <ChevronLeft className="h-4 w-4" />
+//               </Button>
+
+//               <Button variant="outline" size="icon" onClick={() => scroll("right")}>
+//                 <ChevronRight className="h-4 w-4" />
+//               </Button>
+//             </div>
+//           </div>
+
+//           <div
+//             ref={scrollRef}
+//             className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 snap-x"
+//           >
+//             {sortedProducts.map((product) => {
+//               const discount = calculateDiscount(product.mrp, product.price);
+
+//               return (
+//                 <div
+//                   key={product.id}
+//                   className={`min-w-[200px] w-[200px] md:min-w-[240px] md:w-[240px] snap-start bg-card rounded-xl border border-border p-3 transition-all group relative ${
+//                     product.in_stock ? "hover:shadow-lg" : "opacity-70"
+//                   }`}
+//                 >
+//                   <div
+//                     className="relative aspect-square rounded-lg overflow-hidden mb-3 bg-secondary/10 cursor-pointer"
+//                     onClick={() => setQuickViewProduct(product)}
+//                   >
+//                     <img
+//                       src={product.image}
+//                       alt={product.name}
+//                       loading="lazy"
+//                       onError={(e) =>
+//                         ((e.target as HTMLImageElement).src =
+//                           "https://placehold.co/400x400?text=Product")
+//                       }
+//                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+//                     />
+
+//                     {discount && (
+//                       <div className="absolute top-2 right-2 bg-red-600 text-white text-[11px] font-bold px-2 py-1 rounded-full">
+//                         {discount}% OFF
+//                       </div>
+//                     )}
+
+//                     {!product.in_stock && (
+//                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+//                         <span className="bg-red-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">
+//                           OUT OF STOCK
+//                         </span>
+//                       </div>
+//                     )}
+
+//                     <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+//                       <Button
+//                         size="icon"
+//                         variant="secondary"
+//                         className="h-8 w-8 rounded-full bg-white"
+//                         onClick={(e) => {
+//                           e.stopPropagation();
+//                           setQuickViewProduct(product);
+//                         }}
+//                       >
+//                         <Eye className="w-4 h-4" />
+//                       </Button>
+//                     </div>
+//                   </div>
+
+//                   <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px]">
+//                     {product.name}
+//                   </h3>
+
+//                   <div className="mt-2">
+//                     {product.mrp && product.mrp > product.price && (
+//                       <div className="text-xs text-muted-foreground line-through">
+//                         ₹{product.mrp.toFixed(2)}
+//                       </div>
+//                     )}
+//                     <div className="font-bold text-lg text-primary">
+//                       ₹{calculatePrice(product).toFixed(2)}
+//                     </div>
+//                   </div>
+
+//                   <div className="flex justify-end mt-2">
+//                     <Button
+//                       size="icon"
+//                       disabled={!product.in_stock}
+//                       onClick={() => handleAddToCart(product)}
+//                       className={`h-9 w-9 rounded-full shadow-sm transition-colors border ${
+//                         product.in_stock
+//                           ? "bg-secondary hover:bg-primary hover:text-white"
+//                           : "bg-muted cursor-not-allowed"
+//                       }`}
+//                     >
+//                       <Plus className="h-5 w-5" />
+//                     </Button>
+//                   </div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       </section>
+
+//       <Dialog
+//         open={!!quickViewProduct}
+//         onOpenChange={() => setQuickViewProduct(null)}
+//       >
+//         <DialogContent className="max-w-3xl p-0 overflow-hidden">
+//           <DialogTitle className="sr-only">
+//             {quickViewProduct?.name}
+//           </DialogTitle>
+
+//           {quickViewProduct && (
+//             <>
+//               <Button
+//                 size="icon"
+//                 variant="ghost"
+//                 className="absolute top-2 right-2 z-10 bg-white/80"
+//                 onClick={() => setQuickViewProduct(null)}
+//               >
+//                 <X className="h-5 w-5" />
+//               </Button>
+
+//               <div className="w-full aspect-square bg-secondary/10">
+//                 <img
+//                   src={quickViewProduct.image}
+//                   alt={quickViewProduct.name}
+//                   className="w-full h-full object-contain bg-white"
+//                 />
+//               </div>
+//             </>
+//           )}
+//         </DialogContent>
+//       </Dialog>
+//     </>
+//   );
+// };
+
+// export default CategorySection;
+
+
+// import { useRef, useState } from "react";
+// import { ChevronLeft, ChevronRight, Plus, Eye, X } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useCart } from "@/contexts/CartContext";
+// import { useToast } from "@/hooks/use-toast";
+// import { Link } from "react-router-dom";
+// import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface WeightOption {
+//   weight: string;
+//   label: string;
+// }
+
+// interface Product {
+//   id: string;
+//   name: string;
+//   price: number;
+//   mrp?: number;
+//   image: string;
+//   category: string;
+//   in_stock: boolean;
+//   priority?: number;
+//   pricePerKg?: number;
+//   availableWeights?: WeightOption[];
+// }
+
+// interface CategorySectionProps {
+//   title: string;
+//   products: Product[];
+//   bgColor?: string;
+//   categorySlug: string;
+// }
+
+// /* ================================
+//    CURRENCY FORMATTER
+// ================================ */
+// const formatCurrency = (amount: number) => {
+//   return `€${amount.toFixed(2)}`;
+// };
+
+// /* ================================
+//    COMPONENT
+// ================================ */
+// const CategorySection = ({
+//   title,
+//   products,
+//   bgColor = "bg-white",
+//   categorySlug,
+// }: CategorySectionProps) => {
+//   const scrollRef = useRef<HTMLDivElement>(null);
+//   const { addToCart } = useCart();
+//   const { toast } = useToast();
+
+//   const [selectedWeights, setSelectedWeights] = useState<Record<string, string>>({});
+//   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+
+//   /* ================================
+//      PRIORITY SORT
+//   ================================ */
+//   const sortedProducts = [...products].sort((a, b) => {
+//     const pa = a.priority ?? 0;
+//     const pb = b.priority ?? 0;
+
+//     if (pa === 0 && pb === 0) return 0;
+//     if (pa === 0) return 1;
+//     if (pb === 0) return -1;
+//     return pa - pb;
+//   });
+
+//   const calculatePrice = (product: Product) => {
+//     if (!product.pricePerKg || !product.availableWeights) return product.price;
+
+//     const selectedWeight =
+//       selectedWeights[product.id] ||
+//       product.availableWeights[0]?.weight ||
+//       "1";
+
+//     return product.pricePerKg * parseFloat(selectedWeight);
+//   };
+
+//   const calculateDiscount = (mrp?: number, price?: number) => {
+//     if (!mrp || !price || mrp <= price) return null;
+//     return Math.round(((mrp - price) / mrp) * 100);
+//   };
+
+//   const handleAddToCart = (product: Product) => {
+//     if (!product.in_stock) return;
+
+//     addToCart({
+//       ...product,
+//       price: calculatePrice(product),
+//     });
+
+//     toast({
+//       title: "Added to cart",
+//       description: `${product.name} added successfully`,
+//     });
+//   };
+
+//   const scroll = (direction: "left" | "right") => {
+//     if (!scrollRef.current) return;
+
+//     const scrollAmount = scrollRef.current.clientWidth * 0.8;
+//     scrollRef.current.scrollBy({
+//       left: direction === "left" ? -scrollAmount : scrollAmount,
+//       behavior: "smooth",
+//     });
+//   };
+
+//   return (
+//     <>
+//       <section className={`py-12 ${bgColor}`}>
+//         <div className="container mx-auto px-4">
+//           <div className="flex items-center justify-between mb-6">
+//             <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+//               {title}
+//             </h2>
+
+//             <div className="flex items-center gap-2">
+//               <Link
+//                 to={`/category/${categorySlug}`}
+//                 className="text-sm font-semibold text-primary hover:underline mr-2 hidden sm:block"
+//               >
+//                 View All
+//               </Link>
+
+//               <Button variant="outline" size="icon" onClick={() => scroll("left")}>
+//                 <ChevronLeft className="h-4 w-4" />
+//               </Button>
+
+//               <Button variant="outline" size="icon" onClick={() => scroll("right")}>
+//                 <ChevronRight className="h-4 w-4" />
+//               </Button>
+//             </div>
+//           </div>
+
+//           <div
+//             ref={scrollRef}
+//             className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 snap-x"
+//           >
+//             {sortedProducts.map((product) => {
+//               const discount = calculateDiscount(product.mrp, product.price);
+
+//               return (
+//                 <div
+//                   key={product.id}
+//                   className={`min-w-[200px] w-[200px] md:min-w-[240px] md:w-[240px] snap-start bg-card rounded-xl border border-border p-3 transition-all group relative ${
+//                     product.in_stock ? "hover:shadow-lg" : "opacity-70"
+//                   }`}
+//                 >
+//                   <div
+//                     className="relative aspect-square rounded-lg overflow-hidden mb-3 bg-secondary/10 cursor-pointer"
+//                     onClick={() => setQuickViewProduct(product)}
+//                   >
+//                     <img
+//                       src={product.image}
+//                       alt={product.name}
+//                       loading="lazy"
+//                       onError={(e) =>
+//                         ((e.target as HTMLImageElement).src =
+//                           "https://placehold.co/400x400?text=Product")
+//                       }
+//                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+//                     />
+
+//                     {discount && (
+//                       <div className="absolute top-2 right-2 bg-red-600 text-white text-[11px] font-bold px-2 py-1 rounded-full">
+//                         {discount}% OFF
+//                       </div>
+//                     )}
+
+//                     {!product.in_stock && (
+//                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+//                         <span className="bg-red-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">
+//                           OUT OF STOCK
+//                         </span>
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px]">
+//                     {product.name}
+//                   </h3>
+
+//                   <div className="mt-2">
+//                     {product.mrp && product.mrp > product.price && (
+//                       <div className="text-xs text-muted-foreground line-through">
+//                         {formatCurrency(product.mrp)}
+//                       </div>
+//                     )}
+//                     <div className="font-bold text-lg text-primary">
+//                       {formatCurrency(calculatePrice(product))}
+//                     </div>
+//                   </div>
+
+//                   <div className="flex justify-end mt-2">
+//                     <Button
+//                       size="icon"
+//                       disabled={!product.in_stock}
+//                       onClick={() => handleAddToCart(product)}
+//                       className={`h-9 w-9 rounded-full shadow-sm transition-colors border ${
+//                         product.in_stock
+//                           ? "bg-secondary hover:bg-primary hover:text-white"
+//                           : "bg-muted cursor-not-allowed"
+//                       }`}
+//                     >
+//                       <Plus className="h-5 w-5" />
+//                     </Button>
+//                   </div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       </section>
+
+//       <Dialog
+//         open={!!quickViewProduct}
+//         onOpenChange={() => setQuickViewProduct(null)}
+//       >
+//         <DialogContent className="max-w-3xl p-0 overflow-hidden">
+//           <DialogTitle className="sr-only">
+//             {quickViewProduct?.name}
+//           </DialogTitle>
+
+//           {quickViewProduct && (
+//             <>
+//               <Button
+//                 size="icon"
+//                 variant="ghost"
+//                 className="absolute top-2 right-2 z-10 bg-white/80"
+//                 onClick={() => setQuickViewProduct(null)}
+//               >
+//                 <X className="h-5 w-5" />
+//               </Button>
+
+//               <div className="w-full aspect-square bg-secondary/10">
+//                 <img
+//                   src={quickViewProduct.image}
+//                   alt={quickViewProduct.name}
+//                   className="w-full h-full object-contain bg-white"
+//                 />
+//               </div>
+//             </>
+//           )}
+//         </DialogContent>
+//       </Dialog>
+//     </>
+//   );
+// };
+
+// export default CategorySection;
+
+// import { useRef, useState } from "react";
+// import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useCart } from "@/contexts/CartContext";
+// import { useToast } from "@/hooks/use-toast";
+// import { Link } from "react-router-dom";
+// import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface WeightOption {
+//   weight: string;
+//   label: string;
+// }
+
+// interface Product {
+//   id: string;
+//   name: string;
+//   price: number;
+//   mrp?: number;
+//   image: string;
+//   category: string;
+//   final_stock_status: boolean; // 🔥 UPDATED
+//   priority?: number;
+//   pricePerKg?: number;
+//   availableWeights?: WeightOption[];
+// }
+
+// interface CategorySectionProps {
+//   title: string;
+//   products: Product[];
+//   bgColor?: string;
+//   categorySlug: string;
+// }
+
+// /* ================================
+//    CURRENCY FORMATTER
+// ================================ */
+// const formatCurrency = (amount: number) => {
+//   return `€${amount.toFixed(2)}`;
+// };
+
+// const CategorySection = ({
+//   title,
+//   products,
+//   bgColor = "bg-white",
+//   categorySlug,
+// }: CategorySectionProps) => {
+//   const scrollRef = useRef<HTMLDivElement>(null);
+//   const { addToCart } = useCart();
+//   const { toast } = useToast();
+
+//   const [selectedWeights, setSelectedWeights] = useState<Record<string, string>>({});
+//   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+
+//   const sortedProducts = [...products].sort((a, b) => {
+//     const pa = a.priority ?? 0;
+//     const pb = b.priority ?? 0;
+
+//     if (pa === 0 && pb === 0) return 0;
+//     if (pa === 0) return 1;
+//     if (pb === 0) return -1;
+//     return pa - pb;
+//   });
+
+//   const calculatePrice = (product: Product) => {
+//     if (!product.pricePerKg || !product.availableWeights) return product.price;
+
+//     const selectedWeight =
+//       selectedWeights[product.id] ||
+//       product.availableWeights[0]?.weight ||
+//       "1";
+
+//     return product.pricePerKg * parseFloat(selectedWeight);
+//   };
+
+//   const calculateDiscount = (mrp?: number, price?: number) => {
+//     if (!mrp || !price || mrp <= price) return null;
+//     return Math.round(((mrp - price) / mrp) * 100);
+//   };
+
+//   const handleAddToCart = (product: Product) => {
+//     if (!product.final_stock_status) return;
+
+//     addToCart({
+//       ...product,
+//       price: calculatePrice(product),
+//     });
+
+//     toast({
+//       title: "Added to cart",
+//       description: `${product.name} added successfully`,
+//     });
+//   };
+
+//   const scroll = (direction: "left" | "right") => {
+//     if (!scrollRef.current) return;
+
+//     const scrollAmount = scrollRef.current.clientWidth * 0.8;
+//     scrollRef.current.scrollBy({
+//       left: direction === "left" ? -scrollAmount : scrollAmount,
+//       behavior: "smooth",
+//     });
+//   };
+
+//   return (
+//     <>
+//       <section className={`py-12 ${bgColor}`}>
+//         <div className="container mx-auto px-4">
+//           <div className="flex items-center justify-between mb-6">
+//             <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+//               {title}
+//             </h2>
+
+//             <div className="flex items-center gap-2">
+//               <Link
+//                 to={`/category/${categorySlug}`}
+//                 className="text-sm font-semibold text-primary hover:underline mr-2 hidden sm:block"
+//               >
+//                 View All
+//               </Link>
+
+//               <Button variant="outline" size="icon" onClick={() => scroll("left")}>
+//                 <ChevronLeft className="h-4 w-4" />
+//               </Button>
+
+//               <Button variant="outline" size="icon" onClick={() => scroll("right")}>
+//                 <ChevronRight className="h-4 w-4" />
+//               </Button>
+//             </div>
+//           </div>
+
+//           <div
+//             ref={scrollRef}
+//             className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 snap-x"
+//           >
+//             {sortedProducts.map((product) => {
+//               const discount = calculateDiscount(product.mrp, product.price);
+
+//               return (
+//                 <div
+//                   key={product.id}
+//                   className={`min-w-[200px] w-[200px] md:min-w-[240px] md:w-[240px] snap-start bg-card rounded-xl border border-border p-3 transition-all group relative ${
+//                     product.final_stock_status
+//                       ? "hover:shadow-lg"
+//                       : "opacity-70"
+//                   }`}
+//                 >
+//                   <div
+//                     className="relative aspect-square rounded-lg overflow-hidden mb-3 bg-secondary/10 cursor-pointer"
+//                     onClick={() => setQuickViewProduct(product)}
+//                   >
+//                     <img
+//                       src={product.image}
+//                       alt={product.name}
+//                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+//                     />
+
+//                     {discount && (
+//                       <div className="absolute top-2 right-2 bg-red-600 text-white text-[11px] font-bold px-2 py-1 rounded-full">
+//                         {discount}% OFF
+//                       </div>
+//                     )}
+
+//                     {!product.final_stock_status && (
+//                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+//                         <span className="bg-red-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">
+//                           OUT OF STOCK
+//                         </span>
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px]">
+//                     {product.name}
+//                   </h3>
+
+//                   <div className="mt-2">
+//                     {product.mrp && product.mrp > product.price && (
+//                       <div className="text-xs text-muted-foreground line-through">
+//                         {formatCurrency(product.mrp)}
+//                       </div>
+//                     )}
+//                     <div className="font-bold text-lg text-primary">
+//                       {formatCurrency(calculatePrice(product))}
+//                     </div>
+//                   </div>
+
+//                   <div className="flex justify-end mt-2">
+//                     <Button
+//                       size="icon"
+//                       disabled={!product.final_stock_status}
+//                       onClick={() => handleAddToCart(product)}
+//                       className={`h-9 w-9 rounded-full shadow-sm border ${
+//                         product.final_stock_status
+//                           ? "bg-secondary hover:bg-primary hover:text-white"
+//                           : "bg-muted cursor-not-allowed"
+//                       }`}
+//                     >
+//                       <Plus className="h-5 w-5" />
+//                     </Button>
+//                   </div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       </section>
+
+//       <Dialog
+//         open={!!quickViewProduct}
+//         onOpenChange={() => setQuickViewProduct(null)}
+//       >
+//         <DialogContent className="max-w-3xl p-0 overflow-hidden">
+//           <DialogTitle className="sr-only">
+//             {quickViewProduct?.name}
+//           </DialogTitle>
+
+//           {quickViewProduct && (
+//             <>
+//               <Button
+//                 size="icon"
+//                 variant="ghost"
+//                 className="absolute top-2 right-2 z-10 bg-white/80"
+//                 onClick={() => setQuickViewProduct(null)}
+//               >
+//                 <X className="h-5 w-5" />
+//               </Button>
+
+//               <div className="w-full aspect-square bg-secondary/10">
+//                 <img
+//                   src={quickViewProduct.image}
+//                   alt={quickViewProduct.name}
+//                   className="w-full h-full object-contain bg-white"
+//                 />
+//               </div>
+//             </>
+//           )}
+//         </DialogContent>
+//       </Dialog>
+//     </>
+//   );
+// };
+
+// export default CategorySection;
+
+
+
 import { useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Eye, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
@@ -2527,11 +3300,15 @@ interface WeightOption {
 interface Product {
   id: string;
   name: string;
-  price: number;       // selling price
-  mrp?: number;        // original price
+  price: number;
+  mrp?: number;
   image: string;
   category: string;
-  in_stock: boolean;
+
+  // ✅ IMPORTANT — backend weight
+  weight: number;
+
+  final_stock_status: boolean;
   priority?: number;
   pricePerKg?: number;
   availableWeights?: WeightOption[];
@@ -2545,38 +3322,50 @@ interface CategorySectionProps {
 }
 
 /* ================================
-   COMPONENT
+   CURRENCY FORMATTER
 ================================ */
+const formatCurrency = (amount: number) => {
+  return `€${amount.toFixed(2)}`;
+};
+
 const CategorySection = ({
   title,
   products,
   bgColor = "bg-white",
   categorySlug,
 }: CategorySectionProps) => {
+
   const scrollRef = useRef<HTMLDivElement>(null);
+
   const { addToCart } = useCart();
+
   const { toast } = useToast();
 
-  const [selectedWeights, setSelectedWeights] = useState<Record<string, string>>(
-    {}
-  );
-  const [quickViewProduct, setQuickViewProduct] =
-    useState<Product | null>(null);
+  const [selectedWeights, setSelectedWeights] = useState<Record<string, string>>({});
+
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   /* ================================
-     PRIORITY SORT
+     SORT PRODUCTS BY PRIORITY
   ================================ */
   const sortedProducts = [...products].sort((a, b) => {
+
     const pa = a.priority ?? 0;
     const pb = b.priority ?? 0;
 
     if (pa === 0 && pb === 0) return 0;
     if (pa === 0) return 1;
     if (pb === 0) return -1;
+
     return pa - pb;
+
   });
 
+  /* ================================
+     CALCULATE PRICE
+  ================================ */
   const calculatePrice = (product: Product) => {
+
     if (!product.pricePerKg || !product.availableWeights)
       return product.price;
 
@@ -2586,47 +3375,94 @@ const CategorySection = ({
       "1";
 
     return product.pricePerKg * parseFloat(selectedWeight);
+
   };
 
+  /* ================================
+     CALCULATE DISCOUNT
+  ================================ */
   const calculateDiscount = (mrp?: number, price?: number) => {
-    if (!mrp || !price || mrp <= price) return null;
+
+    if (!mrp || !price || mrp <= price)
+      return null;
+
     return Math.round(((mrp - price) / mrp) * 100);
+
   };
 
+  /* ================================
+     ADD TO CART — FIXED WEIGHT
+  ================================ */
   const handleAddToCart = (product: Product) => {
-    if (!product.in_stock) return;
+
+    if (!product.final_stock_status)
+      return;
 
     addToCart({
-      ...product,
+
+      id: product.id,
+
+      name: product.name,
+
+      image: product.image,
+
+      category: product.category,
+
       price: calculatePrice(product),
+
+      // ✅ CRITICAL FIX — PASS BACKEND WEIGHT
+      weight: Number(product.weight),
+
     });
 
     toast({
       title: "Added to cart",
       description: `${product.name} added successfully`,
     });
+
   };
 
+  /* ================================
+     SCROLL FUNCTION
+  ================================ */
   const scroll = (direction: "left" | "right") => {
-    if (!scrollRef.current) return;
+
+    if (!scrollRef.current)
+      return;
 
     const scrollAmount = scrollRef.current.clientWidth * 0.8;
+
     scrollRef.current.scrollBy({
-      left: direction === "left" ? -scrollAmount : scrollAmount,
+
+      left: direction === "left"
+        ? -scrollAmount
+        : scrollAmount,
+
       behavior: "smooth",
+
     });
+
   };
 
+  /* ================================
+     UI
+  ================================ */
   return (
     <>
+
       <section className={`py-12 ${bgColor}`}>
+
         <div className="container mx-auto px-4">
+
+          {/* HEADER */}
           <div className="flex items-center justify-between mb-6">
+
             <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               {title}
             </h2>
 
             <div className="flex items-center gap-2">
+
               <Link
                 to={`/category/${categorySlug}`}
                 className="text-sm font-semibold text-primary hover:underline mr-2 hidden sm:block"
@@ -2634,42 +3470,57 @@ const CategorySection = ({
                 View All
               </Link>
 
-              <Button variant="outline" size="icon" onClick={() => scroll("left")}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => scroll("left")}
+              >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
 
-              <Button variant="outline" size="icon" onClick={() => scroll("right")}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => scroll("right")}
+              >
                 <ChevronRight className="h-4 w-4" />
               </Button>
+
             </div>
+
           </div>
 
+          {/* PRODUCTS */}
           <div
             ref={scrollRef}
             className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 -mx-4 px-4 snap-x"
           >
+
             {sortedProducts.map((product) => {
-              const discount = calculateDiscount(product.mrp, product.price);
+
+              const discount =
+                calculateDiscount(product.mrp, product.price);
 
               return (
+
                 <div
                   key={product.id}
                   className={`min-w-[200px] w-[200px] md:min-w-[240px] md:w-[240px] snap-start bg-card rounded-xl border border-border p-3 transition-all group relative ${
-                    product.in_stock ? "hover:shadow-lg" : "opacity-70"
+                    product.final_stock_status
+                      ? "hover:shadow-lg"
+                      : "opacity-70"
                   }`}
                 >
+
+                  {/* IMAGE */}
                   <div
                     className="relative aspect-square rounded-lg overflow-hidden mb-3 bg-secondary/10 cursor-pointer"
                     onClick={() => setQuickViewProduct(product)}
                   >
+
                     <img
                       src={product.image}
                       alt={product.name}
-                      loading="lazy"
-                      onError={(e) =>
-                        ((e.target as HTMLImageElement).src =
-                          "https://placehold.co/400x400?text=Product")
-                      }
                       className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                     />
 
@@ -2679,7 +3530,7 @@ const CategorySection = ({
                       </div>
                     )}
 
-                    {!product.in_stock && (
+                    {!product.final_stock_status && (
                       <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
                         <span className="bg-red-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">
                           OUT OF STOCK
@@ -2687,68 +3538,73 @@ const CategorySection = ({
                       </div>
                     )}
 
-                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Button
-                        size="icon"
-                        variant="secondary"
-                        className="h-8 w-8 rounded-full bg-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setQuickViewProduct(product);
-                        }}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </div>
                   </div>
 
+                  {/* NAME */}
                   <h3 className="font-semibold text-sm line-clamp-2 min-h-[40px]">
                     {product.name}
                   </h3>
 
+                  {/* PRICE */}
                   <div className="mt-2">
+
                     {product.mrp && product.mrp > product.price && (
                       <div className="text-xs text-muted-foreground line-through">
-                        ₹{product.mrp.toFixed(2)}
+                        {formatCurrency(product.mrp)}
                       </div>
                     )}
+
                     <div className="font-bold text-lg text-primary">
-                      ₹{calculatePrice(product).toFixed(2)}
+                      {formatCurrency(calculatePrice(product))}
                     </div>
+
                   </div>
 
+                  {/* ADD BUTTON */}
                   <div className="flex justify-end mt-2">
+
                     <Button
                       size="icon"
-                      disabled={!product.in_stock}
+                      disabled={!product.final_stock_status}
                       onClick={() => handleAddToCart(product)}
-                      className={`h-9 w-9 rounded-full shadow-sm transition-colors border ${
-                        product.in_stock
+                      className={`h-9 w-9 rounded-full shadow-sm border ${
+                        product.final_stock_status
                           ? "bg-secondary hover:bg-primary hover:text-white"
                           : "bg-muted cursor-not-allowed"
                       }`}
                     >
                       <Plus className="h-5 w-5" />
                     </Button>
+
                   </div>
+
                 </div>
+
               );
+
             })}
+
           </div>
+
         </div>
+
       </section>
 
+      {/* QUICK VIEW */}
       <Dialog
         open={!!quickViewProduct}
         onOpenChange={() => setQuickViewProduct(null)}
       >
+
         <DialogContent className="max-w-3xl p-0 overflow-hidden">
+
           <DialogTitle className="sr-only">
             {quickViewProduct?.name}
           </DialogTitle>
 
           {quickViewProduct && (
             <>
+
               <Button
                 size="icon"
                 variant="ghost"
@@ -2759,18 +3615,25 @@ const CategorySection = ({
               </Button>
 
               <div className="w-full aspect-square bg-secondary/10">
+
                 <img
                   src={quickViewProduct.image}
                   alt={quickViewProduct.name}
                   className="w-full h-full object-contain bg-white"
                 />
+
               </div>
+
             </>
           )}
+
         </DialogContent>
+
       </Dialog>
+
     </>
   );
+
 };
 
 export default CategorySection;

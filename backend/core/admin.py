@@ -172,22 +172,100 @@ class BannerAdmin(admin.ModelAdmin):
 from django.contrib import admin
 from .models import Product
 
-@admin.register(Product)
-class ProductAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "category",
-        "price",
-        "in_stock",
-        "stock_quantity",
-        "priority",
-        "is_active",
-    )
+# @admin.register(Product)
+# class ProductAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "name",
+#         "category",
+#         "price",
+#         "in_stock",
+#         "stock_quantity",
+#         "priority",
+#         "is_active",
+#     )
 
-    list_filter = ("category", "in_stock", "is_active")
-    search_fields = ("name",)
-    ordering = ("-priority",)   # ✅ HIGH PRIORITY FIRST
-    prepopulated_fields = {"slug": ("name",)}
+#     list_filter = ("category", "in_stock", "is_active")
+#     search_fields = ("name",)
+#     ordering = ("-priority",)   # ✅ HIGH PRIORITY FIRST
+#     prepopulated_fields = {"slug": ("name",)}
+
+
+# @admin.register(Product)
+# class ProductAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "name",
+#         "category",
+#         "price",
+#         "mrp",
+#         "in_stock",
+#         "stock_quantity",
+#         "priority",
+#         "is_trending",     # 🔥 ADD THIS
+#         "is_active",
+#     )
+
+#     list_filter = (
+#         "category",
+#         "subcategory",    # 🔥 ADD THIS
+#         "in_stock",
+#         "is_trending",    # 🔥 ADD THIS
+#         "is_active",
+#     )
+
+#     search_fields = ("name",)
+#     ordering = ("-priority",)
+#     prepopulated_fields = {"slug": ("name",)}
+
+#     list_editable = (
+#         "priority",
+#         "is_trending",    # 🔥 QUICK TOGGLE
+#         "is_active",
+#     )
+
+
+from django.contrib import admin
+from .models import Product
+
+#working code 
+# @admin.register(Product)
+# class ProductAdmin(admin.ModelAdmin):
+#     list_display = ("name", "formatted_price", "formatted_mrp", "in_stock")
+#     list_filter = ("in_stock", "is_active", "is_trending")
+#     search_fields = ("name", "slug")
+
+#     # 🔥 Change field labels in form
+#     def get_form(self, request, obj=None, **kwargs):
+#         form = super().get_form(request, obj, **kwargs)
+#         form.base_fields["price"].label = "Price (€ EUR)"
+#         form.base_fields["mrp"].label = "MRP (€ EUR)"
+#         return form
+
+#     def formatted_price(self, obj):
+#         return f"€{obj.price}"
+#     formatted_price.short_description = "Price (€)"
+
+#     def formatted_mrp(self, obj):
+#         return f"€{obj.mrp}"
+#     formatted_mrp.short_description = "MRP (€)"
+# from django.contrib import admin
+# from .models import PromoCode
+
+
+# @admin.register(PromoCode)
+# class PromoCodeAdmin(admin.ModelAdmin):
+#     list_display = (
+#         "code",
+#         "discount_percent",
+#         "active",
+#         "valid_from",
+#         "valid_until",
+#         "is_valid",
+#     )
+#     list_filter = ("active", "valid_from", "valid_until")
+#     search_fields = ("code",)
+#     ordering = ("-valid_until",)
+
+
 from django.contrib import admin
 from .models import PromoCode
 
@@ -196,18 +274,248 @@ from .models import PromoCode
 class PromoCodeAdmin(admin.ModelAdmin):
     list_display = (
         "code",
-        "discount_percent",
-        "active",
+        "discount_type",
+        "discount_value",
+        "is_active",
         "valid_from",
-        "valid_until",
-        "is_valid",
+        "valid_to",
+        "times_used",
     )
-    list_filter = ("active", "valid_from", "valid_until")
+    list_filter = ("is_active", "discount_type")
     search_fields = ("code",)
-    ordering = ("-valid_until",)
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "city", "state", "zip_code", "is_default", "updated_at")
     list_filter = ("is_default", "country", "state")
     search_fields = ("user__email", "line1", "city", "zip_code")
+
+
+
+from django.contrib import admin
+from .models import Order, OrderItem
+
+
+# 🔹 OrderItem Inline (shows products inside order page)
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 0
+    readonly_fields = ("product_name", "quantity", "price")
+    can_delete = False
+
+
+# # 🔹 Order Admin
+# @admin.register(Order)
+# class OrderAdmin(admin.ModelAdmin):
+
+#     list_display = (
+#         "order_id",
+#         "user",
+#         "payment_status",
+#         "status",
+#         "total_amount",
+#         "created_at",
+#     )
+
+#     list_filter = (
+#         "payment_status",
+#         "status",
+#         "created_at",
+#     )
+
+#     search_fields = (
+#         "order_id",
+#         "user__email",
+#         "name",
+#         "phone",
+#     )
+
+#     readonly_fields = (
+#         "order_id",
+#         "revolut_order_id",
+#         "payment_status",
+#         "subtotal",
+#         "discount",
+#         "delivery_fee",
+#         "total_amount",
+#         "created_at",
+#     )
+
+#     inlines = [OrderItemInline]
+
+#     ordering = ("-created_at",)
+
+#     fieldsets = (
+#         ("Order Info", {
+#             "fields": (
+#                 "order_id",
+#                 "user",
+#                 "revolut_order_id",
+#                 "payment_status",
+#                 "status",
+#             )
+#         }),
+
+#         ("Customer Info", {
+#             "fields": (
+#                 "name",
+#                 "phone",
+#                 "address",
+#                 "city",
+#                 "state",
+#                 "pincode",
+#             )
+#         }),
+
+#         ("Pricing", {
+#             "fields": (
+#                 "subtotal",
+#                 "discount",
+#                 "delivery_fee",
+#                 "total_amount",
+#             )
+#         }),
+
+#         ("Timestamps", {
+#             "fields": ("created_at",)
+#         }),
+#     )
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "order_id",
+        "user",
+        "revolut_order_id",   # ✅ ADD THIS
+        "payment_status",
+        "status",
+        "total_amount",
+        "created_at",
+    )
+
+    list_filter = (
+        "payment_status",
+        "status",
+        "created_at",
+    )
+
+    search_fields = (
+        "order_id",
+        "revolut_order_id",   # ✅ ADD THIS
+        "user__email",
+        "name",
+        "phone",
+    )
+
+    readonly_fields = (
+        "order_id",
+        "revolut_order_id",
+        "payment_status",
+        "status",             # ✅ ADD THIS
+        "subtotal",
+        "discount",
+        "delivery_fee",
+        "total_amount",
+        "created_at",
+    )
+
+    inlines = [OrderItemInline]
+
+    ordering = ("-created_at",)
+
+    fieldsets = (
+
+        ("Order Info", {
+            "fields": (
+                "order_id",
+                "user",
+                "revolut_order_id",
+                "payment_status",
+                "status",
+            )
+        }),
+
+        ("Customer Info", {
+            "fields": (
+                "name",
+                "phone",
+                "address",
+                "city",
+                "state",
+                "pincode",
+            )
+        }),
+
+        ("Pricing", {
+            "fields": (
+                "subtotal",
+                "discount",
+                "delivery_fee",
+                "total_amount",
+            )
+        }),
+
+        ("Timestamps", {
+            "fields": (
+                "created_at",
+            )
+        }),
+    )
+
+
+
+# 🔹 Optional: Register OrderItem separately (optional)
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ("order", "product_name", "quantity", "price")
+
+
+
+from django.contrib import admin
+from .models import Product
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+
+    list_display = (
+        "name",
+        "formatted_price",
+        "formatted_mrp",
+        "stock_quantity",
+        "in_stock",
+        "weight",
+        "is_active",
+    )
+
+    list_filter = (
+        "in_stock",
+        "is_active",
+        "is_trending",
+        "category",
+    )
+
+    search_fields = ("name", "slug")
+    prepopulated_fields = {"slug": ("name",)}
+    ordering = ("priority",)
+
+    # 🔥 Change field labels in form
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields["price"].label = "Price (€ EUR)"
+        form.base_fields["mrp"].label = "MRP (€ EUR)"
+        form.base_fields["weight"].label = "Weight (KG)"
+        form.base_fields["stock_quantity"].label = "Stock Quantity"
+        return form
+
+    # 💶 Format Price
+    def formatted_price(self, obj):
+        return f"€{obj.price}"
+    formatted_price.short_description = "Price (€)"
+
+    # 💶 Format MRP
+    def formatted_mrp(self, obj):
+        return f"€{obj.mrp}"
+    formatted_mrp.short_description = "MRP (€)"

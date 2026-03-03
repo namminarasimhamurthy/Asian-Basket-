@@ -1001,6 +1001,609 @@
 // export default Index;
 
 
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import CategorySection from "@/components/CategorySection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: number; // discounted price
+//   mrp: number;   // original price
+//   category: string;
+//   in_stock: boolean;
+//   priority: number;
+// }
+
+// /* ================================
+//    API URLS
+// ================================ */
+// const CATEGORY_API = "http://127.0.0.1:8000/api/auth/categories/";
+// const PRODUCT_API = "http://127.0.0.1:8000/api/auth/products/";
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+
+//   /* ================================
+//      FETCH DATA
+//   ================================ */
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => setCategories(res.data));
+//     axios.get(PRODUCT_API).then((res) => setProducts(res.data));
+//   }, []);
+
+//   /* ================================
+//      FILTER CATEGORIES BY TAB
+//   ================================ */
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <div className="min-h-screen bg-background pb-16 md:pb-0">
+//       <Header />
+
+//       <div className="pt-[188px] md:pt-[200px]">
+//         <Hero />
+//       </div>
+
+//       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+//       <TrendingSection />
+
+//       <main>
+//         {/* ================================
+//             CATEGORY SECTIONS (WITH DISCOUNT)
+//         ================================ */}
+//         {filteredCategories.map((category) => {
+//           const categoryProducts = products
+//             .filter((p) => p.category === category.name)
+//             .sort((a, b) => a.priority - b.priority); // ✅ priority order
+
+//           if (categoryProducts.length === 0) return null;
+
+//           return (
+//             <CategorySection
+//               key={category.id}
+//               title={category.name}
+//               categorySlug={category.slug}
+//               products={categoryProducts.map((p) => ({
+//                 id: p.id.toString(),
+//                 name: p.name,
+//                 price: Number(p.price), // discounted price
+//                 mrp: Number(p.mrp),     // ✅ original price
+//                 category: p.category,
+//                 image: p.image,
+//                 in_stock: p.in_stock,
+//                 priority: p.priority,
+//               }))}
+//             />
+//           );
+//         })}
+//       </main>
+
+//       <Footer />
+//       <BottomNav setIsCartOpen={setIsCartOpen} />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </div>
+//   );
+// };
+
+// export default Index;
+
+
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import CategorySection from "@/components/CategorySection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+
+// /* ================================
+//    TYPES
+// ================================ */
+
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: number;
+//   mrp: number;
+//   category: string;       // slug
+//   category_name: string;  // display name
+//   in_stock: boolean;
+//   priority: number;
+//   weight: number;
+// }
+
+// /* ================================
+//    API URLS
+// ================================ */
+
+// const CATEGORY_API = "http://127.0.0.1:8000/api/auth/categories/";
+// const PRODUCT_API = "http://127.0.0.1:8000/api/auth/products/";
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+
+//   /* ================================
+//      FETCH DATA
+//   ================================ */
+
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => {
+//       setCategories(res.data);
+//     });
+
+//     axios.get(PRODUCT_API).then((res) => {
+//       setProducts(res.data);
+//     });
+//   }, []);
+
+//   /* ================================
+//      FILTER CATEGORIES BY TAB
+//   ================================ */
+
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <div className="min-h-screen bg-background pb-16 md:pb-0">
+//       <Header />
+
+//       <div className="pt-[188px] md:pt-[200px]">
+//         <Hero />
+//       </div>
+
+//       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+//       <TrendingSection />
+
+//       <main>
+//         {filteredCategories.map((category) => {
+//           // 🔥 FIXED: compare SLUG with SLUG
+//           const categoryProducts = products
+//             .filter((p) => p.category === category.slug)
+//             .sort((a, b) => a.priority - b.priority);
+
+//           if (categoryProducts.length === 0) return null;
+
+//           return (
+//             <CategorySection
+//               key={category.id}
+//               title={category.name}
+//               categorySlug={category.slug}
+//               products={categoryProducts.map((p) => ({
+//                 id: p.id.toString(),
+//                 name: p.name,
+//                 price: Number(p.price),
+//                 mrp: Number(p.mrp),
+//                 category: p.category,
+//                 image: p.image,
+//                 in_stock: p.in_stock ?? false,
+//                 priority: p.priority,
+//                 weight: p.weight,
+//               }))}
+//             />
+//           );
+//         })}
+//       </main>
+
+//       <Footer />
+//       <BottomNav setIsCartOpen={setIsCartOpen} />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </div>
+//   );
+// };
+
+// export default Index;
+
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import CategorySection from "@/components/CategorySection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: number; // discounted price
+//   mrp: number;   // original price
+//   category: string;
+//   in_stock: boolean;
+//   priority: number;
+// }
+
+// /* ================================
+//    API URLS
+// ================================ */
+// const CATEGORY_API = "http://127.0.0.1:8000/api/auth/categories/";
+// const PRODUCT_API = "http://127.0.0.1:8000/api/auth/products/";
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+
+//   /* ================================
+//      FETCH DATA
+//   ================================ */
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => setCategories(res.data));
+//     axios.get(PRODUCT_API).then((res) => setProducts(res.data));
+//   }, []);
+
+//   /* ================================
+//      FILTER CATEGORIES BY TAB
+//   ================================ */
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <div className="min-h-screen bg-background pb-16 md:pb-0">
+//       <Header />
+
+//       <div className="pt-[188px] md:pt-[200px]">
+//         <Hero />
+//       </div>
+
+//       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+//       <TrendingSection />
+
+//       <main>
+//         {/* ================================
+//             CATEGORY SECTIONS (WITH DISCOUNT)
+//         ================================ */}
+//         {filteredCategories.map((category) => {
+//           const categoryProducts = products
+//             .filter((p) => p.category === category.name)
+//             .sort((a, b) => a.priority - b.priority); // ✅ priority order
+
+//           if (categoryProducts.length === 0) return null;
+
+//           return (
+//             <CategorySection
+//               key={category.id}
+//               title={category.name}
+//               categorySlug={category.slug}
+//               products={categoryProducts.map((p) => ({
+//                 id: p.id.toString(),
+//                 name: p.name,
+//                 price: Number(p.price), // discounted price
+//                 mrp: Number(p.mrp),     // ✅ original price
+//                 category: p.category,
+//                 image: p.image,
+//                 in_stock: p.in_stock,
+//                 priority: p.priority,
+//               }))}
+//             />
+//           );
+//         })}
+//       </main>
+
+//       <Footer />
+//       <BottomNav setIsCartOpen={setIsCartOpen} />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </div>
+//   );
+// };
+
+// export default Index;
+
+
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import CategorySection from "@/components/CategorySection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: number;
+//   mrp: number;
+//   category: string;
+//   in_stock: boolean;
+//   priority: number;
+// }
+
+// /* ================================
+//    API URLS
+// ================================ */
+// const BASE_URL = "http://127.0.0.1:8000";   // ✅ IMPORTANT
+// const CATEGORY_API = `${BASE_URL}/api/auth/categories/`;
+// const PRODUCT_API = `${BASE_URL}/api/auth/products/`;
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+
+//   /* ================================
+//      FETCH DATA
+//   ================================ */
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => setCategories(res.data));
+//     axios.get(PRODUCT_API).then((res) => setProducts(res.data));
+//   }, []);
+
+//   /* ================================
+//      FILTER CATEGORIES BY TAB
+//   ================================ */
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <div className="min-h-screen bg-background pb-16 md:pb-0">
+//       <Header />
+
+//       <div className="pt-[188px] md:pt-[200px]">
+//         <Hero />
+//       </div>
+
+//       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+//       <TrendingSection />
+
+//       <main>
+//         {filteredCategories.map((category) => {
+//           const categoryProducts = products
+//             // 🔥 FIX 1: Compare slug with slug (not name)
+//             .filter((p) => p.category === category.slug)
+//             .sort((a, b) => a.priority - b.priority);
+
+//           if (categoryProducts.length === 0) return null;
+
+//           return (
+//             <CategorySection
+//               key={category.id}
+//               title={category.name}
+//               categorySlug={category.slug}
+//               products={categoryProducts.map((p) => ({
+//                 id: p.id.toString(),
+//                 name: p.name,
+//                 price: Number(p.price),
+//                 mrp: Number(p.mrp),
+//                 category: p.category,
+
+//                 // 🔥 FIX 2: Add BASE_URL to image
+//                 image: p.image?.startsWith("http")
+//                   ? p.image
+//                   : `${BASE_URL}${p.image}`,
+
+//                 in_stock: p.in_stock,
+//                 priority: p.priority,
+//               }))}
+//             />
+//           );
+//         })}
+//       </main>
+
+//       <Footer />
+//       <BottomNav setIsCartOpen={setIsCartOpen} />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </div>
+//   );
+// };
+
+// export default Index;
+
+
+// working code 
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import CategorySection from "@/components/CategorySection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: string;
+//   mrp: string;
+//   category: string;
+//   final_stock_status: boolean; // ✅ SAME AS CATEGORY PAGE
+//   priority: number;
+// }
+
+// /* ================================
+//    API
+// ================================ */
+// const BASE_URL = "http://127.0.0.1:8000";
+// const CATEGORY_API = `${BASE_URL}/api/auth/categories/`;
+// const PRODUCT_API = `${BASE_URL}/api/auth/products/`;
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+
+//   /* ================================
+//      FETCH DATA
+//   ================================ */
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => setCategories(res.data));
+//     axios.get(PRODUCT_API).then((res) => setProducts(res.data));
+//   }, []);
+
+//   /* ================================
+//      FILTER CATEGORIES
+//   ================================ */
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <div className="min-h-screen bg-background pb-16 md:pb-0">
+//       <Header />
+
+//       <div className="pt-[188px] md:pt-[200px]">
+//         <Hero />
+//       </div>
+
+//       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+//       <TrendingSection />
+
+//       <main>
+//         {filteredCategories.map((category) => {
+//           /* ================================
+//              SAME PRIORITY LOGIC
+//           ================================ */
+//           const categoryProducts = products
+//             .filter((p) => p.category === category.slug)
+//             .sort((a, b) => {
+//               const pa = a.priority ?? 0;
+//               const pb = b.priority ?? 0;
+
+//               if (pa === 0 && pb === 0) return 0;
+//               if (pa === 0) return 1;
+//               if (pb === 0) return -1;
+
+//               return pa - pb;
+//             });
+
+//           if (categoryProducts.length === 0) return null;
+
+//           return (
+//             <CategorySection
+//               key={category.id}
+//               title={category.name}
+//               categorySlug={category.slug}
+//               products={categoryProducts.map((p) => ({
+//                 id: p.id.toString(),
+//                 name: p.name,
+//                 price: Number(p.price),
+//                 mrp: Number(p.mrp),
+
+//                 // ✅ FIX IMAGE (IMPORTANT)
+//                 image: p.image?.startsWith("http")
+//                   ? p.image
+//                   : `${BASE_URL}${p.image}`,
+
+//                 category: p.category,
+
+//                 // ✅ SAME STOCK LOGIC
+//                 final_stock_status: p.final_stock_status,
+
+//                 priority: p.priority,
+//               }))}
+//             />
+//           );
+//         })}
+//       </main>
+
+//       <Footer />
+//       <BottomNav setIsCartOpen={setIsCartOpen} />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </div>
+//   );
+// };
+
+// export default Index;
+
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -1026,18 +1629,22 @@ interface Product {
   id: number;
   name: string;
   image: string;
-  price: number; // discounted price
-  mrp: number;   // original price
+  price: string;
+  mrp: string;
   category: string;
-  in_stock: boolean;
+  final_stock_status: boolean;
   priority: number;
+
+  // ✅ FIX ADDED — WEIGHT FROM BACKEND
+  weight: number;
 }
 
 /* ================================
-   API URLS
+   API
 ================================ */
-const CATEGORY_API = "http://127.0.0.1:8000/api/auth/categories/";
-const PRODUCT_API = "http://127.0.0.1:8000/api/auth/products/";
+const BASE_URL = "http://127.0.0.1:8000";
+const CATEGORY_API = `${BASE_URL}/api/auth/categories/`;
+const PRODUCT_API = `${BASE_URL}/api/auth/products/`;
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -1054,7 +1661,7 @@ const Index = () => {
   }, []);
 
   /* ================================
-     FILTER CATEGORIES BY TAB
+     FILTER CATEGORIES
   ================================ */
   const filteredCategories =
     activeTab === "all"
@@ -1072,16 +1679,24 @@ const Index = () => {
       </div>
 
       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
       <TrendingSection />
 
       <main>
-        {/* ================================
-            CATEGORY SECTIONS (WITH DISCOUNT)
-        ================================ */}
         {filteredCategories.map((category) => {
+
           const categoryProducts = products
-            .filter((p) => p.category === category.name)
-            .sort((a, b) => a.priority - b.priority); // ✅ priority order
+            .filter((p) => p.category === category.slug)
+            .sort((a, b) => {
+              const pa = a.priority ?? 0;
+              const pb = b.priority ?? 0;
+
+              if (pa === 0 && pb === 0) return 0;
+              if (pa === 0) return 1;
+              if (pb === 0) return -1;
+
+              return pa - pb;
+            });
 
           if (categoryProducts.length === 0) return null;
 
@@ -1090,15 +1705,30 @@ const Index = () => {
               key={category.id}
               title={category.name}
               categorySlug={category.slug}
+
               products={categoryProducts.map((p) => ({
+
                 id: p.id.toString(),
+
                 name: p.name,
-                price: Number(p.price), // discounted price
-                mrp: Number(p.mrp),     // ✅ original price
+
+                price: Number(p.price),
+
+                mrp: Number(p.mrp),
+
+                image: p.image?.startsWith("http")
+                  ? p.image
+                  : `${BASE_URL}${p.image}`,
+
                 category: p.category,
-                image: p.image,
-                in_stock: p.in_stock,
+
+                final_stock_status: p.final_stock_status,
+
                 priority: p.priority,
+
+                // ✅ CRITICAL FIX — SEND WEIGHT TO CART
+                weight: Number(p.weight),
+
               }))}
             />
           );
@@ -1106,8 +1736,13 @@ const Index = () => {
       </main>
 
       <Footer />
+
       <BottomNav setIsCartOpen={setIsCartOpen} />
-      <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+
+      <Cart
+        isOpen={isCartOpen}
+        setIsOpen={setIsCartOpen}
+      />
     </div>
   );
 };

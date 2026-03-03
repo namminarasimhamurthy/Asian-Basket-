@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-wbt&46_nbyw9j+&b!x)!4tj*s0!%*$a*m+k_il#wcgd^cc-_9r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # Application definition
@@ -58,14 +59,12 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
+    'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
-    # ✅ Remove global IsAuthenticated - set per-view instead
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',  # ✅ PUBLIC BY DEFAULT
-    ],
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
 }
 
 SIMPLE_JWT = {
@@ -217,3 +216,47 @@ JAZZMIN_SETTINGS = {
     "custom_css": None,
     "custom_js": None,
 }
+
+# import os
+# from dotenv import load_dotenv
+
+# load_dotenv()
+
+# REVOLUT_SECRET_KEY = os.getenv("REVOLUT_SECRET_KEY")
+# REVOLUT_BASE_URL = os.getenv("REVOLUT_BASE_URL")
+# FRONTEND_URL = os.getenv("FRONTEND_URL")
+
+# working code 
+# # ===============================
+# # REVOLUT CONFIG
+# # ===============================
+# from datetime import timedelta
+# from pathlib import Path
+# import os
+# from dotenv import load_dotenv
+
+# load_dotenv()
+# REVOLUT_SECRET_KEY = os.getenv("REVOLUT_SECRET_KEY")
+# REVOLUT_PUBLIC_KEY = os.getenv("REVOLUT_PUBLIC_KEY")
+
+# REVOLUT_BASE_URL = "https://merchant.revolut.com/api/1.0"
+# # FRONTEND_URL = "http://localhost:3000"  # change to production later
+# FRONTEND_URL = "http://localhost:8080"
+
+
+
+# ===============================
+# REVOLUT CONFIG
+# ===============================
+
+from dotenv import load_dotenv
+load_dotenv()
+
+REVOLUT_SECRET_KEY = os.getenv("REVOLUT_SECRET_KEY")
+REVOLUT_PUBLIC_KEY = os.getenv("REVOLUT_PUBLIC_KEY")
+
+REVOLUT_BASE_URL = "https://merchant.revolut.com/api/1.0"
+
+# ✅ CRITICAL FIX
+# FRONTEND_URL = "http://localhost:5173"
+FRONTEND_URL = "http://localhost:8080"

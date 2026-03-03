@@ -230,13 +230,115 @@ class BannerSerializer(serializers.ModelSerializer):
 #         return None
 
 
+# from rest_framework import serializers
+# from .models import Product
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     image = serializers.SerializerMethodField()
+#     category = serializers.StringRelatedField()
+#     subcategory = serializers.StringRelatedField()
+
+#     class Meta:
+#         model = Product
+#         fields = [
+#             "id",
+#             "name",
+#             "slug",
+#             "image",
+#             "mrp",
+#             "price",
+#             "category",
+#             "subcategory",
+#             "in_stock",
+#             "stock_quantity",
+#             "priority",
+#             "is_trending"
+#         ]
+
+#     def get_image(self, obj):
+#         request = self.context.get("request")
+#         if obj.image and request:
+#             return request.build_absolute_uri(obj.image.url)
+#         return None
+
+#working code 
+
+# from rest_framework import serializers
+# from .models import Product
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     image = serializers.SerializerMethodField()
+
+#     # ✅ USE SLUGS (NOT StringRelatedField)
+#     category = serializers.CharField(source="category.slug")
+#     subcategory = serializers.CharField(source="subcategory.slug")
+
+#     class Meta:
+#         model = Product
+#         fields = [
+#             "id",
+#             "name",
+#             "slug",
+#             "image",
+#             "mrp",
+#             "price",
+#             "category",
+#             "subcategory",
+#             "in_stock",
+#             "stock_quantity",
+#             "priority",
+#             "is_trending",
+#         ]
+
+#     def get_image(self, obj):
+#         request = self.context.get("request")
+#         if obj.image and request:
+#             return request.build_absolute_uri(obj.image.url)
+#         return None
+
+
+
 from rest_framework import serializers
 from .models import Product
 
+
+# class ProductSerializer(serializers.ModelSerializer):
+#     image = serializers.SerializerMethodField()
+
+#     # ✅ Send BOTH name and slug
+#     category = serializers.CharField(source="category.slug")
+#     category_name = serializers.CharField(source="category.name")
+
+#     class Meta:
+#         model = Product
+#         fields = [
+#             "id",
+#             "name",
+#             "slug",
+#             "image",
+#             "mrp",
+#             "price",
+#             "stock_quantity",
+#             "in_stock",        # ✅ VERY IMPORTANT
+#             "weight",
+#             "category",        # slug
+#             "category_name",   # name
+#             "priority",
+#         ]
+
+#     def get_image(self, obj):
+#         request = self.context.get("request")
+#         if obj.image and request:
+#             return request.build_absolute_uri(obj.image.url)
+#         return None
+
+
 class ProductSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    category = serializers.StringRelatedField()
-    subcategory = serializers.StringRelatedField()
+    final_stock_status = serializers.ReadOnlyField()
+
+    category = serializers.CharField(source="category.slug")
+    category_name = serializers.CharField(source="category.name")
 
     class Meta:
         model = Product
@@ -247,10 +349,12 @@ class ProductSerializer(serializers.ModelSerializer):
             "image",
             "mrp",
             "price",
-            "category",
-            "subcategory",
-            "in_stock",
             "stock_quantity",
+            "in_stock",
+            "final_stock_status",  # 🔥 IMPORTANT
+            "weight",
+            "category",
+            "category_name",
             "priority",
         ]
 
@@ -259,10 +363,64 @@ class ProductSerializer(serializers.ModelSerializer):
         if obj.image and request:
             return request.build_absolute_uri(obj.image.url)
         return None
+# class PromoCodeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PromoCode
+#         fields = ['code', 'discount_percent']
+
+
+# core/serializers.py
+
+from decimal import Decimal
+from rest_framework import serializers
+from .models import PromoCode
+
+
 class PromoCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PromoCode
-        fields = ['code', 'discount_percent']
+        fields = [
+            "id",
+            "code",
+            "description",
+            "discount_type",
+            "discount_value",
+            "min_order_total",
+            "max_discount_amount",
+            "is_active",
+            "valid_from",
+            "valid_to",
+            "usage_limit",
+            "times_used",
+        ]
+
+
+class ApplyPromoCodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    cart_total = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    def validate(self, attrs):
+        code = attrs["code"].strip().upper()
+        cart_total = attrs["cart_total"]
+
+        try:
+            promo = PromoCode.objects.get(code__iexact=code)
+        except PromoCode.DoesNotExist:
+            raise serializers.ValidationError(
+                {"code": "Invalid promo code."}
+            )
+
+        if not promo.can_be_used(cart_total):
+            raise serializers.ValidationError(
+                {"code": "Promo code cannot be applied to this order."}
+            )
+
+        discount_amount = promo.get_discount_amount(cart_total)
+
+        attrs["promo"] = promo
+        attrs["discount_amount"] = discount_amount
+
+        return attrs
 
 from django.db import transaction
 from rest_framework import serializers

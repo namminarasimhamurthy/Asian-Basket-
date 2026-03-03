@@ -1001,6 +1001,276 @@
 // export default Index;
 
 
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import CategorySection from "@/components/CategorySection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+
+// /* ================================
+//    TYPES
+// ================================ */
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: number; // discounted price
+//   mrp: number;   // original price
+//   category: string;
+//   in_stock: boolean;
+//   priority: number;
+// }
+
+// /* ================================
+//    API URLS
+// ================================ */
+// const CATEGORY_API = "http://127.0.0.1:8000/api/auth/categories/";
+// const PRODUCT_API = "http://127.0.0.1:8000/api/auth/products/";
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+
+//   /* ================================
+//      FETCH DATA
+//   ================================ */
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => setCategories(res.data));
+//     axios.get(PRODUCT_API).then((res) => setProducts(res.data));
+//   }, []);
+
+//   /* ================================
+//      FILTER CATEGORIES BY TAB
+//   ================================ */
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <div className="min-h-screen bg-background pb-16 md:pb-0">
+//       <Header />
+
+//       <div className="pt-[188px] md:pt-[200px]">
+//         <Hero />
+//       </div>
+
+//       <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+//       <TrendingSection />
+
+//       <main>
+//         {/* ================================
+//             CATEGORY SECTIONS (WITH DISCOUNT)
+//         ================================ */}
+//         {filteredCategories.map((category) => {
+//           const categoryProducts = products
+//             .filter((p) => p.category === category.name)
+//             .sort((a, b) => a.priority - b.priority); // ✅ priority order
+
+//           if (categoryProducts.length === 0) return null;
+
+//           return (
+//             <CategorySection
+//               key={category.id}
+//               title={category.name}
+//               categorySlug={category.slug}
+//               products={categoryProducts.map((p) => ({
+//                 id: p.id.toString(),
+//                 name: p.name,
+//                 price: Number(p.price), // discounted price
+//                 mrp: Number(p.mrp),     // ✅ original price
+//                 category: p.category,
+//                 image: p.image,
+//                 in_stock: p.in_stock,
+//                 priority: p.priority,
+//               }))}
+//             />
+//           );
+//         })}
+//       </main>
+
+//       <Footer />
+//       <BottomNav setIsCartOpen={setIsCartOpen} />
+//       <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//     </div>
+//   );
+// };
+
+// export default Index;
+
+
+
+// import { useEffect, useState } from "react";
+// import axios from "axios";
+
+// import Header from "@/components/Header";
+// import Footer from "@/components/Footer";
+// import Hero from "@/components/Hero";
+// import CategoryTabs from "@/components/CategoryTabs";
+// import TrendingSection from "@/components/TrendingSection";
+// import BottomNav from "@/components/BottomNav";
+// import Cart from "@/components/Cart";
+// import CategorySection from "@/components/CategorySection";
+
+// import { Dialog, DialogContent } from "@/components/ui/dialog";
+// import { X } from "lucide-react";
+
+// /* ================================
+//    TYPES
+// ================================ */
+
+// interface Category {
+//   id: number;
+//   name: string;
+//   slug: string;
+// }
+
+// interface Product {
+//   id: number;
+//   name: string;
+//   image: string;
+//   price: number;
+//   mrp: number;
+//   category: string;
+//   category_name: string;
+//   in_stock: boolean;
+//   priority: number;
+// }
+
+// /* ================================
+//    API URLS
+// ================================ */
+
+// const CATEGORY_API = "http://127.0.0.1:8000/api/auth/categories/";
+// const PRODUCT_API = "http://127.0.0.1:8000/api/auth/products/";
+
+// const Index = () => {
+//   const [activeTab, setActiveTab] = useState("all");
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [categories, setCategories] = useState<Category[]>([]);
+//   const [products, setProducts] = useState<Product[]>([]);
+//   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+//   useEffect(() => {
+//     axios.get(CATEGORY_API).then((res) => {
+//       setCategories(res.data);
+//     });
+
+//     axios.get(PRODUCT_API).then((res) => {
+//       setProducts(res.data);
+//     });
+//   }, []);
+
+//   const filteredCategories =
+//     activeTab === "all"
+//       ? categories
+//       : categories.filter((cat) =>
+//           cat.slug.toLowerCase().includes(activeTab)
+//         );
+
+//   return (
+//     <>
+//       <div className="min-h-screen bg-background pb-16 md:pb-0">
+//         <Header />
+
+//         <div className="pt-[188px] md:pt-[200px]">
+//           <Hero />
+//         </div>
+
+//         <CategoryTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+//         <TrendingSection />
+
+//         <main>
+//           {filteredCategories.map((category) => {
+//             const categoryProducts = products
+//               .filter((p) => p.category === category.slug)
+//               .sort((a, b) => a.priority - b.priority);
+
+//             if (categoryProducts.length === 0) return null;
+
+//             return (
+//               <CategorySection
+//                 key={category.id}
+//                 title={category.name}
+//                 categorySlug={category.slug}
+//                 products={categoryProducts.map((p) => ({
+//                   id: p.id.toString(),
+//                   name: p.name,
+//                   price: Number(p.price),
+//                   mrp: Number(p.mrp),
+//                   image: p.image,
+//                   category: p.category,
+//                   in_stock: p.in_stock,
+//                   priority: p.priority,
+//                 }))}
+//               />
+//             );
+//           })}
+//         </main>
+
+//         <Footer />
+//         <BottomNav setIsCartOpen={setIsCartOpen} />
+//         <Cart isOpen={isCartOpen} setIsOpen={setIsCartOpen} />
+//       </div>
+
+//       {/* OPTIONAL QUICK VIEW MODAL (if you still want popup globally) */}
+//       <Dialog
+//         open={!!selectedProduct}
+//         onOpenChange={() => setSelectedProduct(null)}
+//       >
+//         <DialogContent className="max-w-3xl p-0 overflow-hidden">
+//           {selectedProduct && (
+//             <div className="relative">
+//               <button
+//                 onClick={() => setSelectedProduct(null)}
+//                 className="absolute top-3 right-3 bg-white rounded-full p-2 shadow z-10"
+//               >
+//                 <X size={18} />
+//               </button>
+
+//               <div className="relative aspect-square bg-white">
+//                 <img
+//                   src={selectedProduct.image}
+//                   alt={selectedProduct.name}
+//                   className="w-full h-full object-contain"
+//                 />
+
+//                 {!selectedProduct.in_stock && (
+//                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+//                     <span className="bg-red-600 text-white text-sm font-bold px-6 py-3 rounded-full">
+//                       OUT OF STOCK
+//                     </span>
+//                   </div>
+//                 )}
+//               </div>
+//             </div>
+//           )}
+//         </DialogContent>
+//       </Dialog>
+//     </>
+//   );
+// };
+
+// export default Index;
+
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 

@@ -240,3 +240,286 @@ const Cart = ({ isOpen, setIsOpen }: CartProps) => {
 };
 
 export default Cart;
+
+
+
+// import { useState, useEffect } from "react";
+// import {
+//   ShoppingCart,
+//   X,
+//   Plus,
+//   Minus,
+//   Send,
+//   Trash2,
+//   CreditCard,
+// } from "lucide-react";
+// import { Button } from "@/components/ui/button";
+// import { useCart } from "@/contexts/CartContext";
+// import { useToast } from "@/hooks/use-toast";
+// import { useNavigate } from "react-router-dom";
+
+// interface CartProps {
+//   isOpen: boolean;
+//   setIsOpen: (isOpen: boolean) => void;
+// }
+
+// const Cart = ({ isOpen, setIsOpen }: CartProps) => {
+//   const {
+//     cartItems,
+//     removeFromCart,
+//     updateQuantity,
+//     getTotalItems,
+//     getTotalPrice,
+//     clearCart,
+//   } = useCart();
+
+//   const { toast } = useToast();
+//   const navigate = useNavigate();
+//   const [showItems, setShowItems] = useState(false);
+
+//   const totalItems = getTotalItems();
+
+//   /* ================================
+//      ANIMATION CONTROL
+//   ================================ */
+//   useEffect(() => {
+//     if (isOpen) {
+//       setTimeout(() => setShowItems(true), 50);
+//     } else {
+//       setShowItems(false);
+//     }
+//   }, [isOpen]);
+
+//   /* ================================
+//      WHATSAPP CHECKOUT
+//   ================================ */
+//   const handleWhatsappCheckout = () => {
+//     if (cartItems.length === 0) {
+//       toast({
+//         title: "Cart is empty",
+//         description: "Please add items before checkout.",
+//         variant: "destructive",
+//       });
+//       return;
+//     }
+
+//     const orderDetails = cartItems
+//       .map(
+//         (item) =>
+//           `${item.quantity}x ${item.name} - €${(
+//             item.price * item.quantity
+//           ).toFixed(2)}`
+//       )
+//       .join("\n");
+
+//     const total = getTotalPrice().toFixed(2);
+
+//     const message = `New Order from Asian Basket\n\n${orderDetails}\n\nTotal: €${total}`;
+
+//     const whatsappUrl = `https://wa.me/353899899412?text=${encodeURIComponent(
+//       message
+//     )}`;
+
+//     window.open(whatsappUrl, "_blank");
+
+//     toast({
+//       title: "Redirecting to WhatsApp",
+//       description: "Complete your order via WhatsApp!",
+//     });
+
+//     setIsOpen(false);
+//     clearCart();
+//   };
+
+//   /* ================================
+//      REMOVE ITEM
+//   ================================ */
+//   const handleRemoveItem = (itemId: string) => {
+//     removeFromCart(itemId);
+
+//     toast({
+//       title: "Item removed",
+//       description: "Item removed from cart.",
+//     });
+//   };
+
+//   /* ================================
+//      CLEAR CART
+//   ================================ */
+//   const handleClearCart = () => {
+//     clearCart();
+
+//     toast({
+//       title: "Cart cleared",
+//       description: "All items removed.",
+//     });
+//   };
+
+//   return (
+//     <>
+//       {/* Backdrop */}
+//       {isOpen && (
+//         <div
+//           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+//           onClick={() => setIsOpen(false)}
+//         />
+//       )}
+
+//       {/* Cart Drawer */}
+//       <div
+//         className={`fixed right-0 top-0 h-full z-50 transition-all duration-500 ${
+//           isOpen ? "w-full sm:w-96" : "w-0"
+//         } overflow-hidden`}
+//       >
+//         <div className="h-full flex flex-col bg-white dark:bg-gray-900 shadow-2xl">
+//           {/* Header */}
+//           <div className="bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground px-6 py-4 flex items-center justify-between">
+//             <div className="flex items-center gap-3">
+//               <ShoppingCart className="h-6 w-6" />
+//               <div>
+//                 <h2 className="text-xl font-bold">Your Cart</h2>
+//                 <p className="text-xs opacity-90">
+//                   {totalItems} {totalItems === 1 ? "item" : "items"}
+//                 </p>
+//               </div>
+//             </div>
+
+//             <Button
+//               onClick={() => setIsOpen(false)}
+//               variant="ghost"
+//               size="icon"
+//             >
+//               <X className="h-5 w-5" />
+//             </Button>
+//           </div>
+
+//           {/* Cart Items */}
+//           <div className="flex-1 overflow-y-auto p-4">
+//             {cartItems.length === 0 ? (
+//               <div className="flex flex-col items-center justify-center h-full text-center">
+//                 <ShoppingCart className="h-16 w-16 text-muted-foreground mb-4" />
+//                 <p className="font-semibold">Your cart is empty</p>
+//               </div>
+//             ) : (
+//               <div className="space-y-4">
+//                 {cartItems.map((item) => (
+//                   <div
+//                     key={item.id}
+//                     className="border rounded-xl p-4"
+//                   >
+//                     <div className="flex justify-between mb-2">
+//                       <div>
+//                         <h3 className="font-semibold text-sm">
+//                           {item.name}
+//                         </h3>
+//                         <p className="text-xs text-muted-foreground">
+//                           {item.category}
+//                         </p>
+//                       </div>
+
+//                       <Button
+//                         variant="ghost"
+//                         size="icon"
+//                         onClick={() => handleRemoveItem(item.id)}
+//                       >
+//                         <Trash2 className="h-4 w-4" />
+//                       </Button>
+//                     </div>
+
+//                     <div className="flex justify-between items-center">
+//                       {/* Quantity Controls */}
+//                       <div className="flex items-center gap-2">
+//                         <Button
+//                           size="icon"
+//                           variant="ghost"
+//                           onClick={() =>
+//                             updateQuantity(
+//                               item.id,
+//                               Math.max(1, item.quantity - 1)
+//                             )
+//                           }
+//                         >
+//                           <Minus className="h-4 w-4" />
+//                         </Button>
+
+//                         <span className="font-bold">
+//                           {item.quantity}
+//                         </span>
+
+//                         <Button
+//                           size="icon"
+//                           variant="ghost"
+//                           onClick={() =>
+//                             updateQuantity(
+//                               item.id,
+//                               item.quantity + 1
+//                             )
+//                           }
+//                         >
+//                           <Plus className="h-4 w-4" />
+//                         </Button>
+//                       </div>
+
+//                       {/* Price */}
+//                       <div className="text-right">
+//                         <p className="text-sm text-muted-foreground">
+//                           €{item.price.toFixed(2)} each
+//                         </p>
+//                         <p className="font-bold text-primary">
+//                           €{(item.price * item.quantity).toFixed(2)}
+//                         </p>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 ))}
+//               </div>
+//             )}
+//           </div>
+
+//           {/* Footer */}
+//           {cartItems.length > 0 && (
+//             <div className="border-t p-4 space-y-3">
+//               <div className="flex justify-between">
+//                 <span className="font-semibold">Subtotal</span>
+//                 <span className="font-bold">
+//                   €{getTotalPrice().toFixed(2)}
+//                 </span>
+//               </div>
+
+//               <Button
+//                 className="w-full"
+//                 onClick={() => {
+//                   setIsOpen(false);
+//                   navigate("/checkout");
+//                 }}
+//               >
+//                 <CreditCard className="mr-2 h-4 w-4" />
+//                 Proceed to Checkout
+//               </Button>
+
+//               <Button
+//                 variant="outline"
+//                 className="w-full"
+//                 onClick={handleWhatsappCheckout}
+//               >
+//                 <Send className="mr-2 h-4 w-4" />
+//                 Order via WhatsApp
+//               </Button>
+
+//               <Button
+//                 variant="ghost"
+//                 className="w-full text-destructive"
+//                 onClick={handleClearCart}
+//               >
+//                 <Trash2 className="mr-2 h-4 w-4" />
+//                 Clear Cart
+//               </Button>
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Cart;
