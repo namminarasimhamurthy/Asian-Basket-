@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API = "http://127.0.0.1:8000/api/auth/addresses/";
+const API = "https://api.asianbasket.ie/api/auth/addresses/";
 
 export const getAddresses = async (token: string) => {
   return axios.get(API, {
