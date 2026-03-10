@@ -216,35 +216,6 @@ JAZZMIN_SETTINGS = {
     "custom_css": None,
     "custom_js": None,
 }
-
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# REVOLUT_SECRET_KEY = os.getenv("REVOLUT_SECRET_KEY")
-# REVOLUT_BASE_URL = os.getenv("REVOLUT_BASE_URL")
-# FRONTEND_URL = os.getenv("FRONTEND_URL")
-
-# working code 
-# # ===============================
-# # REVOLUT CONFIG
-# # ===============================
-# from datetime import timedelta
-# from pathlib import Path
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-# REVOLUT_SECRET_KEY = os.getenv("REVOLUT_SECRET_KEY")
-# REVOLUT_PUBLIC_KEY = os.getenv("REVOLUT_PUBLIC_KEY")
-
-# REVOLUT_BASE_URL = "https://merchant.revolut.com/api/1.0"
-# # FRONTEND_URL = "http://localhost:3000"  # change to production later
-# FRONTEND_URL = "http://localhost:8080"
-
-
-
 # ===============================
 # REVOLUT CONFIG
 # ===============================
@@ -252,11 +223,15 @@ JAZZMIN_SETTINGS = {
 from dotenv import load_dotenv
 load_dotenv()
 
-REVOLUT_SECRET_KEY = os.getenv("REVOLUT_SECRET_KEY")
-REVOLUT_PUBLIC_KEY = os.getenv("REVOLUT_PUBLIC_KEY")
+REVOLUT_SECRET_KEY = "sk_-D__Ba0UFVFykla-DEseC0uiszRHDPEvfn9fsEyu3Q2aUrTCyD8ZnnMFqq38cSOy"
+REVOLUT_PUBLIC_KEY = "pk_iESyilztHaw6iyCOI85pf3WqhLBKuY1CwMYoCv850g9k6WQX"
 
-REVOLUT_BASE_URL = "https://merchant.revolut.com/api/1.0"
-
+#REVOLUT_BASE_URL = "https://merchant.revolut.com/api/1.0"
+REVOLUT_BASE_URL ="https://sandbox-merchant.revolut.com/api/orders"
 # ✅ CRITICAL FIX
 # FRONTEND_URL = "http://localhost:5173"
-FRONTEND_URL = "http://localhost:8080"
+FRONTEND_URL = "https://trackfood.vercel.app/"
+
+BACKEND_PUBLIC_URL = "https://trackfood.vercel.app/"
+
+REVOLUT_WEBHOOK_SIGNING_SECRET="wsk_Us2HFPJuKiB307kcpzjBJOGE4PPQoTqd"

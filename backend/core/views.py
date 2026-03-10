@@ -204,62 +204,7 @@ class ProductListView(generics.ListAPIView):
             "-created_at"
         )
 
-# class ValidatePromoCodeView(APIView):
-#     def post(self, request):
-#         code = request.data.get('code', '').upper()
-        
-#         if not code:
-#             return Response({'error': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
 
-#         try:
-#             promo = PromoCode.objects.get(code=code)
-            
-#             if not promo.active:
-#                 return Response({'error': 'This promo code is inactive'}, status=status.HTTP_400_BAD_REQUEST)
-                
-#             if not promo.is_valid:
-#                 return Response({'error': 'This promo code has expired'}, status=status.HTTP_400_BAD_REQUEST)
-
-#             # Return success with discount amount
-#             return Response({
-#                 'code': promo.code,
-#                 'discount': promo.discount_percent,
-#                 'message': 'Promo code applied successfully'
-#             })
-#         except PromoCode.DoesNotExist:
-#             return Response({'error': 'Invalid promo code'}, status=status.HTTP_404_NOT_FOUND)
-
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
-# from rest_framework import status
-# from .models import PromoCode
-# from rest_framework.permissions import AllowAny
-
-# class ValidatePromoCodeView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def post(self, request):
-#         code = request.data.get('code', '').strip()
-
-#         if not code:
-#             return Response({'error': 'No code provided'}, status=400)
-
-#         promo = PromoCode.objects.filter(code__iexact=code).first()
-
-#         if not promo:
-#             return Response({'error': 'Invalid promo code'}, status=400)
-
-#         if not promo.active:
-#             return Response({'error': 'This promo code is inactive'}, status=400)
-
-#         if not promo.is_valid:
-#             return Response({'error': 'This promo code has expired'}, status=400)
-
-#         return Response({
-#             'code': promo.code,
-#             'discount': promo.discount_percent,
-#             'message': 'Promo code applied successfully'
-#         })
 
 from django.db import transaction
 from rest_framework import viewsets, status
@@ -317,77 +262,11 @@ def update_profile(request):
         "phone": user.phone
     })
 
-# from django.http import JsonResponse
-# from .models import Product
-
-# def trending_products(request):
-#     products = Product.objects.filter(
-#         is_trending=True,
-#         is_active=True
-#     ).select_related("category", "subcategory")
-
-#     data = []
-#     for p in products:
-#         data.append({
-#             "id": p.id,
-#             "name": p.name,
-#             "slug": p.slug,
-#             "category": p.category.slug,       # ✅ slug
-#             "subcategory": p.subcategory.slug, # ✅ slug
-#         })
-
-#     return JsonResponse(data, safe=False)
-
-
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import AllowAny
-# from rest_framework.response import Response
-# from .models import Product
-
-# @api_view(["GET"])
-# @permission_classes([AllowAny])
-# def trending_products(request):
-#     products = Product.objects.filter(
-#         is_trending=True,   # 🔥 ONLY TRUE
-#         is_active=True
-#     ).select_related("category", "subcategory")
-
-#     data = [
-#         {
-#             "id": p.id,
-#             "name": p.name,
-#             "slug": p.slug,
-#             "category": p.category.slug,
-#             "subcategory": p.subcategory.slug,
-#         }
-#         for p in products
-#     ]
-
-#     return Response(data)
-
-
-
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from .models import Product
 from .serializers import ProductSerializer
-
-# @api_view(["GET"])
-# @authentication_classes([])   # public API
-# @permission_classes([AllowAny])
-# def trending_products(request):
-#     products = Product.objects.filter(
-#         is_trending=True,
-#         is_active=True
-#     ).order_by("-priority", "-created_at")
-
-#     serializer = ProductSerializer(
-#         products,
-#         many=True,
-#         context={"request": request}
-#     )
-#     return Response(serializer.data)
 
 from .serializers import ProductSerializer
 
@@ -461,158 +340,6 @@ def trending_products_simple(request):
 
     return Response(data)
 
-
-# @api_view(["GET"])
-# @authentication_classes([])
-# @permission_classes([AllowAny])
-# def trending_products_simple(request):
-#     products = Product.objects.filter(
-#         is_trending=True,
-#         is_active=True
-#     )
-
-#     data = [
-#         {
-#             "id": p.id,
-#             "name": p.name,
-#             "slug": p.slug,          # ✅ IMPORTANT
-#         }
-#         for p in products
-#     ]
-
-#     return Response(data)
-
-
-
-# import requests
-# from django.conf import settings
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from .models import Order
-
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     amount = request.data.get("amount")
-
-#     # 1️⃣ Create local order
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=amount,
-#         currency="EUR"
-#     )
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Content-Type": "application/json",
-#     }
-
-#     payload = {
-#         "amount": int(float(amount) * 100),  # Convert to cents
-#         "currency": "EUR",
-#         "capture_mode": "AUTOMATIC",
-#         "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
-#     }
-
-#     response = requests.post(
-#         f"{settings.REVOLUT_BASE_URL}/orders",
-#         json=payload,
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     if response.status_code != 201:
-#         return Response(data, status=400)
-
-#     # Save Revolut order ID
-#     order.revolut_order_id = data.get("id")
-#     order.save()
-
-#     return Response({
-#         "checkout_url": data.get("checkout_url"),
-#         "order_id": str(order.order_id)
-#     })
-
-# from rest_framework.decorators import api_view
-# from rest_framework.response import Response
-# from rest_framework.permissions import IsAuthenticated
-# import requests
-
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.GET.get("order_id")
-
-#     if not order_id:
-#         return Response({"error": "Order ID missing"}, status=400)
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#     }
-
-#     response = requests.get(
-#         f"{settings.REVOLUT_BASE_URL}/orders/{order.revolut_order_id}",
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     # 🔥 IMPORTANT PART
-#     if data.get("state") == "COMPLETED":
-#         order.status = "PAID"
-#         order.save()
-#     elif data.get("state") == "FAILED":
-#         order.status = "FAILED"
-#         order.save()
-
-#     return Response({
-#         "order_id": str(order.order_id),
-#         "status": order.status,
-#         "amount": order.total_amount,
-#     })
-
-
-# from rest_framework.decorators import api_view
-# from rest_framework.response import Response
-# from django.views.decorators.csrf import csrf_exempt
-# import json
-
-# @csrf_exempt
-# @api_view(["POST"])
-# def revolut_webhook(request):
-
-#     payload = json.loads(request.body)
-#     revolut_id = payload.get("id")
-#     state = payload.get("state")
-
-#     try:
-#         order = Order.objects.get(revolut_order_id=revolut_id)
-#     except Order.DoesNotExist:
-#         return Response(status=200)
-
-#     if state == "COMPLETED":
-#         order.status = "PAID"
-#     elif state == "FAILED":
-#         order.status = "FAILED"
-
-#     order.save()
-
-#     return Response(status=200)
-
-
-
-# core/views.py
-
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -654,579 +381,19 @@ class ApplyPromoCodeView(APIView):
             })
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-
-
-
-
-# import requests
-# from django.conf import settings
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from .models import Order
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     amount = request.data.get("amount")
-
-#     if not amount:
-#         return Response({"error": "Amount required"}, status=400)
-
-#     # 1️⃣ Create local order
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=amount,
-#         currency="EUR"
-#     )
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Content-Type": "application/json",
-#     }
-
-#     payload = {
-#         "amount": int(float(amount) * 100),  # convert to cents
-#         "currency": "EUR",
-#         "capture_mode": "AUTOMATIC",
-#         "merchant_order_ext_ref": str(order.order_id),
-#         "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
-#     }
-
-#     response = requests.post(
-#         f"{settings.REVOLUT_BASE_URL}/orders",
-#         json=payload,
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     if response.status_code != 201:
-#         return Response(data, status=400)
-
-#     order.revolut_order_id = data.get("id")
-#     order.save()
-
-#     return Response({
-#         "checkout_url": data.get("checkout_url"),
-#         "order_id": str(order.order_id)
-#     })
-
-
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.GET.get("order_id")
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#     }
-
-#     response = requests.get(
-#         f"{settings.REVOLUT_BASE_URL}/orders/{order.revolut_order_id}",
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     if data.get("state") == "COMPLETED":
-#         order.status = "PAID"
-#     elif data.get("state") == "FAILED":
-#         order.status = "FAILED"
-
-#     order.save()
-
-#     return Response({
-#         "order_id": str(order.order_id),
-#         "status": order.status,
-#         "amount": order.total_amount
-#     })
-
-
-
-# import requests
-# from django.conf import settings
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from .models import Order
-
-
-# # ==========================================
-# # CREATE REVOLUT PAYMENT
-# # ==========================================
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     amount = request.data.get("amount")
-
-#     if not amount:
-#         return Response({"error": "Amount required"}, status=400)
-
-#     try:
-#         amount = float(amount)
-#         if amount <= 0:
-#             return Response({"error": "Invalid amount"}, status=400)
-#     except ValueError:
-#         return Response({"error": "Amount must be number"}, status=400)
-
-#     # 1️⃣ Create Local Order
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=amount,
-#         currency="EUR",
-#         status="PENDING"
-#     )
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Content-Type": "application/json",
-#     }
-
-#     # ✅ CORRECT REVOLUT PAYLOAD STRUCTURE
-#     payload = {
-#         "amount": int(amount * 100),  # convert to cents
-#         "currency": "EUR",
-#         "capture_mode": "AUTOMATIC",
-#         "merchant_order_ext_ref": str(order.order_id),
-#         "checkout": {
-#             "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
-#         }
-#     }
-
-#     response = requests.post(
-#         f"{settings.REVOLUT_BASE_URL}/orders",
-#         json=payload,
-#         headers=headers
-#     )
-
-#     try:
-#         data = response.json()
-#     except Exception:
-#         return Response({"error": "Invalid response from Revolut"}, status=500)
-
-#     # 🔥 Debug if failed
-#     if response.status_code != 201:
-#         print("REVOLUT ERROR:", data)
-#         return Response({"error": data}, status=400)
-
-#     # Save Revolut order ID
-#     order.revolut_order_id = data.get("id")
-#     order.save()
-
-#     return Response({
-#         "checkout_url": data.get("checkout_url"),
-#         "order_id": str(order.order_id)
-#     })
-
-
-# # ==========================================
-# # VERIFY REVOLUT PAYMENT
-# # ==========================================
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.GET.get("order_id")
-
-#     if not order_id:
-#         return Response({"error": "Order ID required"}, status=400)
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     if not order.revolut_order_id:
-#         return Response({"error": "Invalid Revolut order"}, status=400)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#     }
-
-#     response = requests.get(
-#         f"{settings.REVOLUT_BASE_URL}/orders/{order.revolut_order_id}",
-#         headers=headers
-#     )
-
-#     try:
-#         data = response.json()
-#     except Exception:
-#         return Response({"error": "Invalid response from Revolut"}, status=500)
-
-#     state = data.get("state")
-
-#     if state == "COMPLETED":
-#         order.status = "PAID"
-#     elif state == "FAILED":
-#         order.status = "FAILED"
-#     else:
-#         order.status = "PENDING"
-
-#     order.save()
-
-#     return Response({
-#         "order_id": str(order.order_id),
-#         "status": order.status,
-#         "amount": order.total_amount
-#     })
-
-
-# import requests
-# from django.conf import settings
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from .models import Order
-
-
-# # ==================================================
-# # CREATE REVOLUT PAYMENT
-# # ==================================================
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     amount = request.data.get("amount")
-
-#     if not amount:
-#         return Response({"error": "Amount required"}, status=400)
-
-#     try:
-#         amount = float(amount)
-#         if amount <= 0:
-#             return Response({"error": "Invalid amount"}, status=400)
-#     except ValueError:
-#         return Response({"error": "Amount must be number"}, status=400)
-
-#     # 1️⃣ Create Local Order
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=amount,
-#         currency="EUR",
-#         status="PENDING"
-#     )
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Content-Type": "application/json",
-#     }
-
-#     payload = {
-#         "amount": int(amount * 100),  # convert to cents
-#         "currency": "EUR",
-#         "capture_mode": "AUTOMATIC",
-#         "merchant_order_ext_ref": str(order.order_id),
-#         "checkout": {
-#             "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
-#         }
-#     }
-
-#     try:
-#         response = requests.post(
-#             f"{settings.REVOLUT_BASE_URL}/orders",
-#             json=payload,
-#             headers=headers
-#         )
-
-#         data = response.json()
-
-#     except Exception as e:
-#         return Response({"error": str(e)}, status=500)
-
-#     if response.status_code != 201:
-#         print("REVOLUT ERROR STATUS:", response.status_code)
-#         print("REVOLUT ERROR BODY:", data)
-
-#         return Response({
-#             "error": data.get("message") or data.get("code") or str(data)
-#         }, status=400)
-
-#     order.revolut_order_id = data.get("id")
-#     order.save()
-
-#     return Response({
-#         "checkout_url": data.get("checkout_url"),
-#         "order_id": str(order.order_id)
-#     })
-
-
-# # ==================================================
-# # VERIFY REVOLUT PAYMENT
-# # ==================================================
-# @api_view(["GET"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.GET.get("order_id")
-
-#     if not order_id:
-#         return Response({"error": "Order ID required"}, status=400)
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     if not order.revolut_order_id:
-#         return Response({"error": "Invalid Revolut order"}, status=400)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#     }
-
-#     try:
-#         response = requests.get(
-#             f"{settings.REVOLUT_BASE_URL}/orders/{order.revolut_order_id}",
-#             headers=headers
-#         )
-
-#         data = response.json()
-
-#     except Exception as e:
-#         return Response({"error": str(e)}, status=500)
-
-#     state = data.get("state")
-
-#     if state == "COMPLETED":
-#         order.status = "PAID"
-#     elif state == "FAILED":
-#         order.status = "FAILED"
-#     else:
-#         order.status = "PENDING"
-
-#     order.save()
-
-#     return Response({
-#         "order_id": str(order.order_id),
-#         "status": order.status,
-#         "amount": order.total_amount
-#     })
-
-
-# import requests
-# from django.conf import settings
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from .models import Order
-
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     amount = request.data.get("amount")
-
-#     if not amount:
-#         return Response({"error": "Amount required"}, status=400)
-
-#     try:
-#         amount = float(amount)
-#         if amount <= 0:
-#             return Response({"error": "Invalid amount"}, status=400)
-#     except ValueError:
-#         return Response({"error": "Amount must be number"}, status=400)
-
-#     # Create local order
-#     order = Order.objects.create(
-#         user=request.user,
-#         total_amount=amount,
-#         currency="EUR",
-#         status="PENDING"
-#     )
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Content-Type": "application/json",
-#         "Accept": "application/json",
-#         "Revolut-Api-Version": "2023-09-01",  # 🔥 REQUIRED
-#     }
-
-#     payload = {
-#         "amount": int(amount * 100),
-#         "currency": "EUR",
-#         "capture_mode": "automatic"
-#     }
-
-#     response = requests.post(
-#         "https://merchant.revolut.com/api/orders",
-#         json=payload,
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     if response.status_code != 201:
-#         print("REVOLUT ERROR STATUS:", response.status_code)
-#         print("REVOLUT ERROR BODY:", data)
-#         return Response({"error": data}, status=400)
-
-#     order.revolut_order_id = data.get("id")
-#     order.save()
-
-#     return Response({
-#         "checkout_url": data.get("checkout_url"),
-#         "order_id": str(order.order_id)
-#     })
-
-
-
+ 
 import requests
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Order
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def create_revolut_payment(request):
-
-    amount = request.data.get("amount")
-    currency = request.data.get("currency")
-
-    if not amount:
-        return Response({"error": "Amount required"}, status=400)
-
-    if not currency:
-        return Response({"error": "Currency required"}, status=400)
-
-    try:
-        amount = float(amount)
-        if amount <= 0:
-            return Response({"error": "Invalid amount"}, status=400)
-    except ValueError:
-        return Response({"error": "Amount must be number"}, status=400)
-
-    currency = currency.upper()
-
-    # Create local order
-    order = Order.objects.create(
-        user=request.user,
-        total_amount=amount,
-        currency=currency,
-        status="PENDING"
-    )
-
-    headers = {
-        "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Revolut-Api-Version": "2023-09-01",
-    }
-
-    payload = {
-        "amount": int(amount * 100),
-        "currency": currency,
-        "capture_mode": "automatic"
-    }
-
-    response = requests.post(
-        "https://merchant.revolut.com/api/orders",
-        json=payload,
-        headers=headers
-    )
-
-    data = response.json()
-
-    if response.status_code != 201:
-        print("REVOLUT ERROR STATUS:", response.status_code)
-        print("REVOLUT ERROR BODY:", data)
-        return Response({"error": data}, status=400)
-
-    order.revolut_order_id = data.get("id")
-    order.save()
-
-    return Response({
-        "checkout_url": data.get("checkout_url"),
-        "order_id": str(order.order_id)
-    })
-
-
 import requests
 from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Order, OrderItem
-
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     data = request.data
-
-#     # 1️⃣ Create Local Order FIRST
-#     order = Order.objects.create(
-#         user=request.user,
-#         name=data.get("name"),
-#         phone=data.get("phone"),
-#         address=data.get("address"),
-#         city=data.get("city"),
-#         state=data.get("state"),
-#         pincode=data.get("pincode"),
-#         subtotal=data.get("subtotal"),
-#         discount=data.get("discount", 0),
-#         delivery_fee=data.get("delivery_fee", 0),
-#         total_amount=data.get("total_amount"),
-#     )
-
-#     # 2️⃣ Save Order Items
-#     for item in data.get("items", []):
-#         OrderItem.objects.create(
-#             order=order,
-#             product_name=item["name"],
-#             quantity=item["quantity"],
-#             price=item["price"],
-#         )
-
-#     # 3️⃣ Create Revolut Order
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Content-Type": "application/json",
-#         "Revolut-Api-Version": "2023-09-01",
-#     }
-
-#     payload = {
-#         "amount": int(float(order.total_amount) * 100),
-#         "currency": "EUR",
-#         "capture_mode": "automatic",
-#     }
-
-#     response = requests.post(
-#         "https://merchant.revolut.com/api/orders",
-#         json=payload,
-#         headers=headers
-#     )
-
-#     if response.status_code != 201:
-#         order.payment_status = "FAILED"
-#         order.save()
-#         return Response({"error": "Payment creation failed"}, status=400)
-
-#     revolut_data = response.json()
-
-#     order.revolut_order_id = revolut_data.get("id")
-#     order.save()
-
-#     return Response({
-#         "checkout_url": revolut_data.get("checkout_url"),
-#         "order_id": order.order_id
-#     })
-
 
 import requests
 from django.conf import settings
@@ -1237,481 +404,13 @@ from rest_framework import status
 
 from .models import Order, OrderItem
 
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     data = request.data
-
-#     # ✅ REQUIRED FIELD VALIDATION
-#     required_fields = [
-#         "name",
-#         "phone",
-#         "address",
-#         "city",
-#         "state",
-#         "pincode",
-#         "subtotal",
-#         "delivery_fee",
-#         "total_amount",
-#         "items"
-#     ]
-
-#     for field in required_fields:
-#         if not data.get(field):
-#             return Response(
-#                 {"error": f"{field} is required"},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#     try:
-#         # ✅ CREATE LOCAL ORDER
-#         order = Order.objects.create(
-#             user=request.user,
-#             name=data.get("name"),
-#             phone=data.get("phone"),
-#             address=data.get("address"),
-#             city=data.get("city"),
-#             state=data.get("state"),
-#             pincode=data.get("pincode"),
-#             subtotal=data.get("subtotal"),
-#             discount=data.get("discount", 0),
-#             delivery_fee=data.get("delivery_fee", 0),
-#             total_amount=data.get("total_amount"),
-#             status="PENDING",
-#             payment_status="PENDING"
-#         )
-
-#         # ✅ SAVE ORDER ITEMS
-#         for item in data.get("items", []):
-#             OrderItem.objects.create(
-#                 order=order,
-#                 product_name=item["name"],
-#                 quantity=item["quantity"],
-#                 price=item["price"],
-#             )
-
-#         # ✅ REVOLUT API CALL
-#         headers = {
-#             "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#             "Content-Type": "application/json",
-#             "Revolut-Api-Version": "2023-09-01",
-#         }
-
-#         payload = {
-#             "amount": int(float(order.total_amount) * 100),
-#             "currency": "EUR",
-#             "capture_mode": "automatic",
-#         }
-
-#         response = requests.post(
-#             "https://merchant.revolut.com/api/orders",
-#             json=payload,
-#             headers=headers
-#         )
-
-#         revolut_data = response.json()
-
-#         # ❌ HANDLE FAILURE
-#         if response.status_code != 201:
-
-#             order.payment_status = "FAILED"
-#             order.status = "FAILED"
-#             order.save()
-
-#             return Response(
-#                 {"error": revolut_data},
-#                 status=status.HTTP_400_BAD_REQUEST
-#             )
-
-#         # ✅ SAVE REVOLUT ID
-#         order.revolut_order_id = revolut_data.get("id")
-#         order.save()
-
-#         return Response({
-#             "checkout_url": revolut_data.get("checkout_url"),
-#             "order_id": order.order_id
-#         })
-
-#     except Exception as e:
-
-#         return Response(
-#             {"error": str(e)},
-#             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-#         )
-
-#working code
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     data = request.data
-
-#     print("CHECKOUT DATA RECEIVED:", data)
-
-#     required_fields = [
-#         "name",
-#         "phone",
-#         "address",
-#         "city",
-#         "state",
-#         "pincode",
-#         "subtotal",
-#         "delivery_fee",
-#         "total_amount",
-#         "items"
-#     ]
-
-#     for field in required_fields:
-
-#         if field not in data:
-#             return Response(
-#                 {"error": f"{field} is required"},
-#                 status=400
-#             )
-
-#         if data[field] is None:
-#             return Response(
-#                 {"error": f"{field} cannot be null"},
-#                 status=400
-#             )
-
-#     try:
-
-#         order = Order.objects.create(
-#             user=request.user,
-#             name=data["name"],
-#             phone=data["phone"],
-#             address=data["address"],
-#             city=data["city"],
-#             state=data["state"],
-#             pincode=data["pincode"],
-#             subtotal=data["subtotal"],
-#             discount=data.get("discount", 0),
-#             delivery_fee=data["delivery_fee"],
-#             total_amount=data["total_amount"],
-#             status="PENDING",
-#             payment_status="PENDING"
-#         )
-
-#         for item in data["items"]:
-
-#             OrderItem.objects.create(
-#                 order=order,
-#                 product_name=item["name"],
-#                 quantity=item["quantity"],
-#                 price=item["price"],
-#             )
-
-#         headers = {
-#             "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#             "Content-Type": "application/json",
-#             "Revolut-Api-Version": "2023-09-01",
-#         }
-
-#         payload = {
-#             "amount": int(float(order.total_amount) * 100),
-#             "currency": "EUR",
-#             "capture_mode": "automatic",
-#         }
-
-#         response = requests.post(
-#             "https://merchant.revolut.com/api/orders",
-#             json=payload,
-#             headers=headers
-#         )
-
-#         revolut_data = response.json()
-
-#         if response.status_code != 201:
-
-#             order.payment_status = "FAILED"
-#             order.status = "FAILED"
-#             order.save()
-
-#             return Response(
-#                 {"error": revolut_data},
-#                 status=400
-#             )
-
-#         order.revolut_order_id = revolut_data["id"]
-#         order.save()
-
-#         return Response({
-#             "checkout_url": revolut_data["checkout_url"],
-#             "order_id": order.order_id
-#         })
-
-#     except Exception as e:
-
-#         print("PAYMENT ERROR:", str(e))
-
-#         return Response(
-#             {"error": str(e)},
-#             status=500
-#         )
-    
-
-# working code
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     data = request.data
-
-#     print("CHECKOUT DATA RECEIVED:", data)
-
-#     required_fields = [
-#         "name",
-#         "phone",
-#         "address",
-#         "city",
-#         "state",
-#         "pincode",
-#         "subtotal",
-#         "delivery_fee",
-#         "total_amount",
-#         "items",
-#         "currency"
-#     ]
-
-#     for field in required_fields:
-#         if field not in data or data[field] is None:
-#             return Response({"error": f"{field} is required"}, status=400)
-
-#     try:
-
-#         # 1️⃣ CREATE ORDER
-#         order = Order.objects.create(
-#             user=request.user,
-#             name=data["name"],
-#             phone=data["phone"],
-#             address=data["address"],
-#             city=data["city"],
-#             state=data["state"],
-#             pincode=data["pincode"],
-#             subtotal=data["subtotal"],
-#             discount=data.get("discount", 0),
-#             delivery_fee=data["delivery_fee"],
-#             total_amount=data["total_amount"],
-#             currency=data["currency"],
-#             status="PENDING",
-#             payment_status="PENDING"
-#         )
-
-#         # 2️⃣ SAVE ITEMS
-#         for item in data["items"]:
-#             OrderItem.objects.create(
-#                 order=order,
-#                 product_name=item["name"],
-#                 quantity=item["quantity"],
-#                 price=item["price"],
-#             )
-
-#         # 3️⃣ REVOLUT HEADERS
-#         headers = {
-#             "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#             "Content-Type": "application/json",
-#             "Accept": "application/json",
-#             "Revolut-Api-Version": "2023-09-01",
-#         }
-
-#         # ✅ FULL REDIRECT CONFIGURATION
-#         payload = {
-#             "amount": int(float(order.total_amount) * 100),
-#             "currency": data["currency"],
-#             "capture_mode": "automatic",
-
-#             "checkout": {
-
-#                 # SUCCESS redirect
-#                 "redirect_url":
-#                 f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}",
-
-#                 # REQUIRED
-#                 "return_url":
-#                 f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}",
-
-#                 # REQUIRED
-#                 "cancel_url":
-#                 f"{settings.FRONTEND_URL}/checkout"
-#             }
-#         }
-
-#         response = requests.post(
-#             "https://merchant.revolut.com/api/orders",
-#             json=payload,
-#             headers=headers
-#         )
-
-#         revolut_data = response.json()
-
-#         print("REVOLUT RESPONSE:", revolut_data)
-
-#         if response.status_code != 201:
-
-#             order.payment_status = "FAILED"
-#             order.status = "FAILED"
-#             order.save()
-
-#             return Response({"error": revolut_data}, status=400)
-
-#         # 4️⃣ SAVE REVOLUT ID
-#         order.revolut_order_id = revolut_data["id"]
-#         order.save()
-
-#         # 5️⃣ RETURN CHECKOUT URL
-#         return Response({
-#             "checkout_url": revolut_data["checkout_url"],
-#             "order_id": order.order_id
-#         })
-
-#     except Exception as e:
-
-#         print("PAYMENT ERROR:", str(e))
-
-#         return Response({"error": str(e)}, status=500)
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.data.get("order_id")
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Revolut-Api-Version": "2023-09-01",
-#     }
-
-#     response = requests.get(
-#         f"https://merchant.revolut.com/api/orders/{order.revolut_order_id}",
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     if data.get("state") == "completed":
-#         order.payment_status = "PAID"
-#         order.status = "PROCESSED"
-#     else:
-#         order.payment_status = "FAILED"
-
-#     order.save()
-
-#     return Response({"payment_status": order.payment_status})
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def create_revolut_payment(request):
-
-#     data = request.data
-
-#     required_fields = [
-#         "name",
-#         "phone",
-#         "address",
-#         "city",
-#         "state",
-#         "pincode",
-#         "subtotal",
-#         "delivery_fee",
-#         "total_amount",
-#         "items"
-#     ]
-
-#     for field in required_fields:
-#         if field not in data or data[field] is None:
-#             return Response({"error": f"{field} is required"}, status=400)
-
-#     try:
-
-#         # CREATE ORDER
-#         order = Order.objects.create(
-#             user=request.user,
-#             name=data["name"],
-#             phone=data["phone"],
-#             address=data["address"],
-#             city=data["city"],
-#             state=data["state"],
-#             pincode=data["pincode"],
-#             subtotal=data["subtotal"],
-#             discount=data.get("discount", 0),
-#             delivery_fee=data["delivery_fee"],
-#             total_amount=data["total_amount"],
-#             status="PENDING",
-#             payment_status="PENDING"
-#         )
-
-#         # SAVE ITEMS
-#         for item in data["items"]:
-#             OrderItem.objects.create(
-#                 order=order,
-#                 product_name=item["name"],
-#                 quantity=item["quantity"],
-#                 price=item["price"],
-#             )
-
-#         headers = {
-#             "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#             "Content-Type": "application/json",
-#             "Revolut-Api-Version": "2023-09-01",
-#         }
-
-#         # ✅ CORRECT PAYLOAD
-#         payload = {
-#             "amount": int(float(order.total_amount) * 100),
-#             "currency": "EUR",
-#             "capture_mode": "AUTOMATIC",
-#             "checkout": {
-#                 "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
-#             }
-#         }
-
-#         # ✅ CORRECT ENDPOINT
-#         response = requests.post(
-#             "https://merchant.revolut.com/api/1.0/orders",
-#             json=payload,
-#             headers=headers
-#         )
-
-#         revolut_data = response.json()
-
-#         print("REVOLUT RESPONSE:", revolut_data)
-
-#         if response.status_code != 201:
-#             order.payment_status = "FAILED"
-#             order.status = "FAILED"
-#             order.save()
-#             return Response({"error": revolut_data}, status=400)
-
-#         order.revolut_order_id = revolut_data["id"]
-#         order.save()
-
-#         return Response({
-#             "checkout_url": revolut_data["checkout_url"],
-#             "order_id": order.order_id
-#         })
-
-#     except Exception as e:
-#         print("REVOLUT ERROR:", str(e))
-#         return Response({"error": str(e)}, status=500)
-
-
-
-
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework.response import Response
-# from rest_framework import status
-# import requests
-# from django.conf import settings
-# from .models import Order, OrderItem
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+import requests
+from django.conf import settings
+from .models import Order, OrderItem
 
 
 # @api_view(["POST"])
@@ -1735,6 +434,7 @@ from .models import Order, OrderItem
 #         "items"
 #     ]
 
+#     # ✅ Validate fields
 #     for field in required_fields:
 #         if field not in data or data[field] is None:
 #             return Response(
@@ -1744,7 +444,7 @@ from .models import Order, OrderItem
 
 #     try:
 
-#         # ✅ CREATE LOCAL ORDER
+#         # ✅ STEP 1: Create local order
 #         order = Order.objects.create(
 #             user=request.user,
 #             name=data["name"],
@@ -1761,7 +461,9 @@ from .models import Order, OrderItem
 #             payment_status="PENDING"
 #         )
 
-#         # ✅ SAVE ITEMS
+#         print("LOCAL ORDER CREATED:", order.order_id)
+
+#         # ✅ STEP 2: Save order items
 #         for item in data["items"]:
 #             OrderItem.objects.create(
 #                 order=order,
@@ -1770,7 +472,7 @@ from .models import Order, OrderItem
 #                 price=item["price"],
 #             )
 
-#         # ✅ REVOLUT HEADERS
+#         # ✅ STEP 3: Revolut headers
 #         headers = {
 #             "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
 #             "Content-Type": "application/json",
@@ -1778,36 +480,37 @@ from .models import Order, OrderItem
 #             "Revolut-Api-Version": "2023-09-01",
 #         }
 
-#         # ✅ REVOLUT PAYLOAD (CORRECT FORMAT)
+#         # ✅ STEP 4: CORRECT hosted checkout payload
 #         payload = {
-#             "amount": int(float(order.total_amount) * 100),
+#             "amount": int(float(order.total_amount) * 100),  # cents
 #             "currency": "EUR",
 #             "capture_mode": "automatic",
+
+#             # important reference
 #             "merchant_order_ext_ref": str(order.order_id),
-#             "checkout": {
-#                 "redirect_url":
-#                 f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
-#             }
+
+#             # ✅ THIS IS THE FIX
+#             "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
 #         }
 
 #         print("REVOLUT PAYLOAD:", payload)
 
-#         # ✅ CORRECT ENDPOINT
+#         # ✅ STEP 5: Create Revolut order
 #         response = requests.post(
-#             "https://merchant.revolut.com/api/orders",
+#             "https://sandbox-merchant.revolut.com/api/orders",
 #             json=payload,
 #             headers=headers
 #         )
 
 #         revolut_data = response.json()
 
-#         print("REVOLUT RESPONSE STATUS:", response.status_code)
-#         print("REVOLUT RESPONSE DATA:", revolut_data)
+#         print("REVOLUT STATUS:", response.status_code)
+#         print("REVOLUT DATA:", revolut_data)
 
 #         if response.status_code != 201:
 
 #             order.payment_status = "FAILED"
-#             order.status = "FAILED"
+#             order.status = "CANCELLED"
 #             order.save()
 
 #             return Response(
@@ -1815,13 +518,15 @@ from .models import Order, OrderItem
 #                 status=status.HTTP_400_BAD_REQUEST
 #             )
 
-#         # ✅ SAVE REVOLUT ORDER ID
-#         order.revolut_order_id = revolut_data["id"]
+#         # ✅ STEP 6: Save revolut order id
+#         order.revolut_order_id = revolut_data.get("id")
 #         order.save()
 
-#         # ✅ RETURN CHECKOUT URL
+#         print("REVOLUT ORDER CREATED:", order.revolut_order_id)
+
+#         # ✅ STEP 7: Return checkout url
 #         return Response({
-#             "checkout_url": revolut_data["checkout_url"],
+#             "checkout_url": revolut_data.get("checkout_url"),
 #             "order_id": str(order.order_id)
 #         })
 
@@ -1829,28 +534,23 @@ from .models import Order, OrderItem
 
 #         print("REVOLUT ERROR:", str(e))
 
+#         order.payment_status = "FAILED"
+#         order.status = "CANCELLED"
+#         order.save()
+
 #         return Response(
 #             {"error": str(e)},
 #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
 #         )
+# views.py
 
-
-
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import status
-import requests
-from django.conf import settings
-from .models import Order, OrderItem
-
+from .utils import calculate_delivery_fee  # ✅ Import from utils.py
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def create_revolut_payment(request):
 
     data = request.data
-
     print("CHECKOUT REQUEST DATA:", data)
 
     required_fields = [
@@ -1866,7 +566,7 @@ def create_revolut_payment(request):
         "items"
     ]
 
-    # ✅ Validate fields
+    # ✅ Validate required fields
     for field in required_fields:
         if field not in data or data[field] is None:
             return Response(
@@ -1875,8 +575,37 @@ def create_revolut_payment(request):
             )
 
     try:
+        subtotal = float(data["subtotal"])
+        discount = float(data.get("discount", 0))
+        frontend_delivery_fee = round(float(data["delivery_fee"]), 2)
 
-        # ✅ STEP 1: Create local order
+        # ✅ STEP 1: Recalculate delivery fee on backend
+        delivery_result = calculate_delivery_fee(
+            items=data["items"],
+            city=data["city"],
+            subtotal=subtotal
+        )
+        expected_delivery_fee = delivery_result["total"]
+
+        print("EXPECTED DELIVERY FEE:", expected_delivery_fee)
+        print("FRONTEND DELIVERY FEE:", frontend_delivery_fee)
+        print("DELIVERY BREAKDOWN:", delivery_result)
+
+        # ✅ STEP 2: Reject if frontend tampered with delivery fee
+        if frontend_delivery_fee != expected_delivery_fee:
+            return Response(
+                {
+                    "error": f"Invalid delivery fee. "
+                             f"Expected €{expected_delivery_fee}, "
+                             f"got €{frontend_delivery_fee}"
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # ✅ STEP 3: Always use backend-calculated total
+        calculated_total = round(subtotal - discount + expected_delivery_fee, 2)
+
+        # ✅ STEP 4: Create local order with backend-verified values
         order = Order.objects.create(
             user=request.user,
             name=data["name"],
@@ -1885,17 +614,17 @@ def create_revolut_payment(request):
             city=data["city"],
             state=data["state"],
             pincode=data["pincode"],
-            subtotal=data["subtotal"],
-            discount=data.get("discount", 0),
-            delivery_fee=data["delivery_fee"],
-            total_amount=data["total_amount"],
+            subtotal=subtotal,
+            discount=discount,
+            delivery_fee=expected_delivery_fee,  # ✅ backend value
+            total_amount=calculated_total,        # ✅ backend value
             status="PENDING",
-            payment_status="CREATED"
+            payment_status="PENDING"
         )
 
         print("LOCAL ORDER CREATED:", order.order_id)
 
-        # ✅ STEP 2: Save order items
+        # ✅ STEP 5: Save order items
         for item in data["items"]:
             OrderItem.objects.create(
                 order=order,
@@ -1904,7 +633,7 @@ def create_revolut_payment(request):
                 price=item["price"],
             )
 
-        # ✅ STEP 3: Revolut headers
+        # ✅ STEP 6: Revolut headers
         headers = {
             "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
             "Content-Type": "application/json",
@@ -1912,27 +641,20 @@ def create_revolut_payment(request):
             "Revolut-Api-Version": "2023-09-01",
         }
 
-        # ✅ STEP 4: CORRECT hosted checkout payload
+        # ✅ STEP 7: Revolut payload with backend-calculated total
         payload = {
-            "amount": int(float(order.total_amount) * 100),  # cents
+            "amount": int(calculated_total * 100),  # cents
             "currency": "EUR",
             "capture_mode": "automatic",
-
-            # important reference
             "merchant_order_ext_ref": str(order.order_id),
-
-            # ✅ THIS IS THE FIX
-            "hosted_checkout": {
-                "return_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}",
-                "cancel_url": f"{settings.FRONTEND_URL}/checkout"
-            }
+            "redirect_url": f"{settings.FRONTEND_URL}/payment-success?order_id={order.order_id}"
         }
 
         print("REVOLUT PAYLOAD:", payload)
 
-        # ✅ STEP 5: Create Revolut order
+        # ✅ STEP 8: Create Revolut order
         response = requests.post(
-            "https://merchant.revolut.com/api/orders",
+            settings.REVOLUT_BASE_URL,  # ✅ Use settings, not hardcoded URL
             json=payload,
             headers=headers
         )
@@ -1943,230 +665,41 @@ def create_revolut_payment(request):
         print("REVOLUT DATA:", revolut_data)
 
         if response.status_code != 201:
-
             order.payment_status = "FAILED"
             order.status = "CANCELLED"
             order.save()
-
             return Response(
                 {"error": revolut_data},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # ✅ STEP 6: Save revolut order id
+        # ✅ STEP 9: Save revolut order id
         order.revolut_order_id = revolut_data.get("id")
         order.save()
 
         print("REVOLUT ORDER CREATED:", order.revolut_order_id)
 
-        # ✅ STEP 7: Return checkout url
+        # ✅ STEP 10: Return checkout url
         return Response({
             "checkout_url": revolut_data.get("checkout_url"),
             "order_id": str(order.order_id)
         })
 
     except Exception as e:
-
         print("REVOLUT ERROR:", str(e))
 
-        order.payment_status = "FAILED"
-        order.status = "CANCELLED"
-        order.save()
+        # ✅ Only update order if it was created before the exception
+        try:
+            order.payment_status = "FAILED"
+            order.status = "CANCELLED"
+            order.save()
+        except UnboundLocalError:
+            pass  # Order was never created, nothing to update
 
         return Response(
             {"error": str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
-
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.data.get("order_id")
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Revolut-Api-Version": "2023-09-01",
-#     }
-
-#     response = requests.get(
-#         f"https://merchant.revolut.com/api/orders/{order.revolut_order_id}",
-#         headers=headers
-#     )
-
-#     data = response.json()
-
-#     state = data.get("state")
-
-#     if state == "COMPLETED":
-
-#         order.payment_status = "PAID"
-#         order.status = "PROCESSED"
-
-#     elif state == "FAILED":
-
-#         order.payment_status = "FAILED"
-#         order.status = "FAILED"
-
-#     else:
-
-#         order.payment_status = "PENDING"
-#         order.status = "PENDING"
-
-#     order.save()
-
-#     return Response({
-#         "payment_status": order.payment_status,
-#         "order_status": order.status
-#     })
-
-
-# import time
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.data.get("order_id")
-
-#     try:
-#         order = Order.objects.get(order_id=order_id, user=request.user)
-#     except Order.DoesNotExist:
-#         return Response({"error": "Order not found"}, status=404)
-
-#     headers = {
-#         "Authorization": f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Revolut-Api-Version": "2023-09-01",
-#     }
-
-#     # ✅ Retry up to 5 times
-#     for i in range(5):
-
-#         response = requests.get(
-#             f"https://merchant.revolut.com/api/orders/{order.revolut_order_id}",
-#             headers=headers
-#         )
-
-#         data = response.json()
-#         state = data.get("state")
-
-#         print("Revolut state:", state)
-
-#         if state == "COMPLETED":
-
-#             order.payment_status = "PAID"
-#             order.status = "PROCESSED"
-#             order.save()
-
-#             return Response({
-#                 "payment_status": "PAID",
-#                 "order_status": "PROCESSED"
-#             })
-
-#         elif state == "FAILED":
-
-#             order.payment_status = "FAILED"
-#             order.status = "FAILED"
-#             order.save()
-
-#             return Response({
-#                 "payment_status": "FAILED",
-#                 "order_status": "FAILED"
-#             })
-
-#         time.sleep(2)  # wait 2 seconds
-
-#     # If still pending
-#     order.payment_status = "PENDING"
-#     order.save()
-
-#     return Response({
-#         "payment_status": "PENDING",
-#         "order_status": order.status
-#     })
-
-
-# import time
-
-# @api_view(["POST"])
-# @permission_classes([IsAuthenticated])
-# def verify_revolut_payment(request):
-
-#     order_id = request.data.get("order_id")
-
-#     try:
-#         order = Order.objects.get(
-#             order_id=order_id,
-#             user=request.user
-#         )
-#     except Order.DoesNotExist:
-#         return Response(
-#             {"error": "Order not found"},
-#             status=404
-#         )
-
-#     headers = {
-#         "Authorization":
-#         f"Bearer {settings.REVOLUT_SECRET_KEY}",
-#         "Revolut-Api-Version": "2023-09-01",
-#     }
-
-#     for i in range(5):
-
-#         response = requests.get(
-#             f"https://merchant.revolut.com/api/orders/{order.revolut_order_id}",
-#             headers=headers
-#         )
-
-#         data = response.json()
-
-#         state = data.get("state")
-
-#         print("Revolut state:", state)
-
-#         # Save raw state
-#         order.revolut_status = state
-
-#         if state == "COMPLETED":
-
-#             order.payment_status = "PAID"
-#             order.status = "PROCESSED"
-
-#             order.save()
-
-#             return Response({
-#                 "payment_status": "PAID",
-#                 "order_status": "PROCESSED"
-#             })
-
-#         elif state == "FAILED":
-
-#             order.payment_status = "FAILED"
-#             order.status = "FAILED"
-
-#             order.save()
-
-#             return Response({
-#                 "payment_status": "FAILED",
-#                 "order_status": "FAILED"
-#             })
-
-#         time.sleep(2)
-
-#     order.payment_status = "PENDING"
-#     order.save()
-
-#     return Response({
-#         "payment_status": "PENDING",
-#         "order_status": order.status
-#     })
 
 
 @api_view(["POST"])
@@ -2217,3 +750,67 @@ def verify_revolut_payment(request):
         "payment_status": order.payment_status,
         "order_status": order.status
     })
+
+# Add this to views.py (exact copy-paste)
+import logging
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.db import transaction
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Order
+
+logger = logging.getLogger(__name__)
+
+@csrf_exempt
+@method_decorator(csrf_exempt, name='dispatch')
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([AllowAny])
+@transaction.atomic
+def revolut_webhook(request):
+    """
+    Revolut webhook endpoint - updates Order.payment_status automatically
+    """
+    payload = request.data
+    logger.info(f"REVOLUT WEBHOOK RECEIVED: {payload}")
+
+    event_type = payload.get("event")
+    order_data = payload.get("data", {}).get("order", {})
+
+    # Use merchant_order_ext_ref (what you set during order creation)
+    ext_ref = order_data.get("merchant_order_ext_ref")
+    
+    if not ext_ref:
+        logger.warning("Webhook missing merchant_order_ext_ref")
+        return Response({"detail": "Missing order reference"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        order = Order.objects.get(order_id=ext_ref)
+    except Order.DoesNotExist:
+        logger.warning(f"Webhook order not found: {ext_ref}")
+        return Response({"detail": "Order not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Map Revolut events/states to your Order model
+    if event_type == "ORDER_COMPLETED":
+        order.payment_status = "PAID"
+        order.status = "PROCESSED"
+    elif event_type in ["ORDER_PAYMENT_FAILED", "ORDER_PAYMENT_DECLINED"]:
+        order.payment_status = "FAILED"
+        order.status = "CANCELLED"
+    elif order_data.get("state") == "completed":
+        order.payment_status = "PAID"
+        order.status = "PROCESSED"
+    elif order_data.get("state") in ["failed", "declined", "cancelled"]:
+        order.payment_status = "FAILED"
+        order.status = "CANCELLED"
+    else:
+        logger.info(f"Webhook ignored for state: {order_data.get('state')}")
+        return Response({"detail": "Ignored event"}, status=status.HTTP_200_OK)
+
+    order.save()
+    logger.info(f"Order {order.order_id} updated to {order.payment_status}")
+
+    return Response({"detail": "ok"}, status=status.HTTP_200_OK)

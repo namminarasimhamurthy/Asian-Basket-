@@ -73,6 +73,7 @@ from .views import (
     ProductListView,
     BannerListAPIView,
     AddressViewSet,
+    revolut_webhook,
     update_profile,
     trending_products,
     trending_products_simple,
@@ -97,7 +98,7 @@ urlpatterns = [
     path("trending-products-simple/", trending_products_simple, name="trending-products-simple"),
     path("payment/create/", create_revolut_payment, name="create-payment"),
     path("apply-promocode/", ApplyPromoCodeView.as_view(), name="apply-promocode"),
-    path("payment/create/", create_revolut_payment),
     path("payment/verify/", verify_revolut_payment),
+    path("payment/webhook/revolut/", revolut_webhook, name="revolut-webhook"),
     path('', include(router.urls)),
 ]
